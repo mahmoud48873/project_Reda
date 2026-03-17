@@ -8,11 +8,10 @@
 }
 :root {
   --main-color: #0090f0;
-  --p_color: #7b7b7b;
   --bg_color: #f3f3f3;
   --white_color: #fff;
   --color_heading: #253237;
-  --bouder_color: #d6d6d6d5;
+  --border_color: #d6d6d6d5;
 }
 body {
   background: white;
@@ -45,4 +44,23 @@ a {
   width: 90%;
   margin: 0 auto;
   max-width: 1350px;
+}
+.btn {
+  padding: 10px 25px;
+  text-transform: capitalize;
+  border-radius: 30px;
+  cursor: pointer;
+  background-color: #0090f0;
+  color: white;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+  width: fit-content;
+  white-space: nowrap;
+}
+.btn:hover{
+  scale: 1.1;
+
 }
