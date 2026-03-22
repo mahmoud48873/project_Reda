@@ -25,7 +25,7 @@ export default function SilederProduct({data,title}) {
         <div className="top_slide">
           <h2>{title}</h2>
           <p>
-        ooohh
+        hi
           </p>
         </div>
         <Swiper

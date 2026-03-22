@@ -2,6 +2,8 @@
 import TopHeader from './components/header/TopHeader'
 import BtmHeader from './components/header/BtmHeader'
 import Home from './page/Home/Home'
+import { Routes, Route } from 'react-router-dom'
+import ProductDetails from './page/ProductDetails/ProductDetails'
 
 
 function App() {
@@ -16,7 +18,21 @@ function App() {
       <BtmHeader/>
      
     </header>
-    <Home/> 
+
+
+<Routes> 
+  <Route path='/' element={<Home/>}></Route>
+   <Route path='/products/:id' element={<ProductDetails/>}></Route> 
+</Routes>
+  
+
+
+
+
+
+
+
+
       
     </>
   )
