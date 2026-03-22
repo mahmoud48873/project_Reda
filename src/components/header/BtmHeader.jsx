@@ -33,7 +33,7 @@ export default function BtmHeader() {
           <div className="category_nav ">
             <div className="category_btm  text-white text-[15px] font-semibold"onClick={()=>setIsCategoryOpen(!isCategoryOpen)}>
               <IoMdMenu />
-              <p>Browse Category</p>
+              <p>Browse Category</p> 
               <IoIosArrowDown />
             </div>
             <div className={`category_nav_list ${isCategoryOpen ? "active" : ""}`}>

@@ -1,7 +1,8 @@
 
 import TopHeader from './components/header/TopHeader'
 import BtmHeader from './components/header/BtmHeader'
-import Home from './page/Home'
+import Home from './page/Home/Home'
+
 
 function App() {
 
@@ -13,6 +14,7 @@ function App() {
     <header>
       <TopHeader/>
       <BtmHeader/>
+     
     </header>
     <Home/> 
       
