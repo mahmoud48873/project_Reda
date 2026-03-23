@@ -3,6 +3,7 @@ import BtmHeader from "./components/header/BtmHeader";
 import Home from "./page/Home/Home";
 import { Routes, Route } from "react-router-dom";
 import ProductDetails from "./page/ProductDetails/ProductDetails";
+import Footer from "./components/footer/Footer";
 
 function App() {
   return (
@@ -16,6 +17,8 @@ function App() {
         <Route path="/" element={<Home />}></Route>
         <Route path="/products/:id" element={<ProductDetails />}></Route>
       </Routes>
+
+      <Footer />
     </>
   );
 }

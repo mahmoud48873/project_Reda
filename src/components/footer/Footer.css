@@ -1,0 +1,214 @@
+.footer {
+  background-color: var(--color_heading);
+  color: white;
+  padding: 80px 0 20px;
+  margin-top: 100px;
+  position: relative;
+  overflow: hidden;
+}
+
+
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 10% 20%, rgba(0, 144, 240, 0.05) 0%, rgba(0, 0, 0, 0) 50%);
+  pointer-events: none;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr;
+  gap: 40px;
+  margin-bottom: 50px;
+}
+
+.footer-section h3 {
+  color: white;
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+  position: relative;
+  width: fit-content;
+}
+
+.footer-section h3::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background-color: var(--main-color);
+  transition: width 0.3s ease;
+}
+
+.footer-section:hover h3::after {
+  width: 60px;
+}
+
+.footer-logo {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: white;
+  letter-spacing: 1px;
+}
+
+.footer-logo span {
+  color: var(--main-color);
+}
+
+.footer-desc {
+  color: #a0aec0;
+  line-height: 1.8;
+  margin-bottom: 25px;
+  max-width: 350px;
+}
+
+.social-links {
+  display: flex;
+  gap: 15px;
+}
+
+.social-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.1rem;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.social-icon:hover {
+  transform: translateY(-5px);
+  background: var(--main-color);
+  border-color: var(--main-color);
+  box-shadow: 0 10px 20px rgba(0, 144, 240, 0.3);
+}
+
+
+.social-icon.facebook:hover { background: #1877f2; border-color: #1877f2; box-shadow: 0 10px 20px rgba(24, 119, 242, 0.3); }
+.social-icon.instagram:hover { background: #ff4dff; border-color: #ff4dff; box-shadow: 0 10px 20px rgba(255, 77, 255, 0.3); }
+.social-icon.tiktok:hover { background: #000000; border-color: #333; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); }
+.social-icon.whatsapp:hover { background: #25d366; border-color: #25d366; box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3); }
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-section ul li {
+  margin-bottom: 12px;
+}
+
+.footer-section ul li a {
+  color: #a0aec0;
+  transition: all 0.3s ease;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.footer-section ul li a:hover {
+  color: white;
+  transform: translateX(5px);
+}
+
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.contact-icon {
+  color: var(--main-color);
+  font-size: 1.2rem;
+  margin-top: 5px;
+}
+
+.contact-text p {
+  color: #a0aec0;
+  font-size: 0.9rem;
+  margin-bottom: 2px;
+}
+
+.contact-text a, .contact-text span {
+  color: white;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.contact-text a:hover {
+  color: var(--main-color);
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 30px 0;
+  text-align: center;
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.footer-bottom span {
+  color: var(--main-color);
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+  }
+}
+
+@media (max-width: 640px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .footer-section.about {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .footer-desc {
+    max-width: 100%;
+  }
+  
+  .footer-section h3::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .footer-section:hover h3::after {
+    width: 60px;
+    transform: translateX(-50%);
+  }
+  
+  .footer-section {
+    text-align: center;
+  }
+  
+  .contact-item {
+    justify-content: center;
+    text-align: right;
+  }
+  
+  .footer-section ul li a:hover {
+    transform: translateY(-3px);
+  }
+}
