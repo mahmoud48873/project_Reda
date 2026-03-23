@@ -4,7 +4,10 @@ import { IoMdCart } from "react-icons/io";
 import { Link } from "react-router-dom";
 import logo from "../../img/logo.png";
 import "./header.css";
+import { useContext } from "react";
+import { CartContext } from "../context/CartContext";
 export default function TopHeader() {
+  const {CartItem} = useContext(CartContext);
   return (
     <div className="top_header ">
       <div className="container ">
@@ -24,7 +27,7 @@ export default function TopHeader() {
           </div>
           <div className="icon">
             <IoMdCart />
-            <span className="count">0</span>
+            <span className="count">{CartItem.length}</span>
           </div>
         </div>
       </div>

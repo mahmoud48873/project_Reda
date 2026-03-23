@@ -2,7 +2,7 @@ import "./Home.css";
 import HeroSlider from "../../components/header/HeroSlider";
 import SliderProduct from "../../components/sliderProducts/SilederProduct";
 import { useEffect, useState } from "react";
-
+import Loading from "../../components/loading/Loading";
 const categories = [
   "smartphones",
   "mobile-accessories",
@@ -52,7 +52,11 @@ const[loading,setLoading] =useState(true)
       <HeroSlider />
 
       {loading ? (
-        <p>Loading</p>
+        <>
+          {categories.map((_, index) => (
+            <Loading key={index} />
+          ))}
+        </>
       ) : (
         <>
           {categories.map((category) => (

@@ -6,6 +6,7 @@
   --color_heading: #253237;
   --border_color: #d6d6d6d5;
 }
+
 .top_header .container {
   display: flex;
   justify-content: space-around;

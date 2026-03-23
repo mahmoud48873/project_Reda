@@ -1,0 +1,41 @@
+.skeleton-container {
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.skeleton-header {
+  width: 15%;
+  height: 40px;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-content {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.skeleton-box {
+  width: 200px;
+  height: 330px;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    background-color: #e0e0e0;
+  }
+  50% {
+    background-color: #c0c0c0;
+  }
+  100% {
+    background-color: #e0e0e0;
+  }
+}

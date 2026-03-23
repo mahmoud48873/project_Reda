@@ -151,9 +151,31 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
+.poduct.added .icons .add{
+  background: #0090f0;
+  color: #ffffff;
+ 
+}
 
 .icons span:hover {
   background: #0090f0;
   color: #ffffff;
   transform: translateY(-2px);
+}
+.poduct .stat_cart{
+  position: absolute;
+  top: 4px;
+ left:50%;
+ transform: translate(-50%);
+ font-size: 10px;
+ transition: 0.3s;
+ display: flex;
+ align-items: center;
+ gap: 5px;
+ color: rgb(31, 168, 13);
+
+
+}
+.poduct .stat_cart svg{
+  color:rgb(31, 168, 13);
 }

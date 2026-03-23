@@ -1,0 +1,84 @@
+.product-loading .pulse {
+  background-color: #e0e0e0;
+  animation: pulse-animation 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse-animation {
+  0% { background-color: #e0e0e0; }
+  50% { background-color: #c0c0c0; }
+  100% { background-color: #e0e0e0; }
+}
+
+.product-loading .skeleton-bag-img {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.product-loading .sma_img_skeleton {
+  display: flex;
+  justify-content: space-between;
+}
+
+.product-loading .skeleton-sma-img {
+  width: 24%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+}
+
+.product-loading .skeleton-title {
+  width: 70%;
+  height: 40px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.product-loading .skeleton-stars {
+  width: 120px;
+  height: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.product-loading .skeleton-price {
+  width: 100px;
+  height: 25px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.product-loading .skeleton-availability,
+.product-loading .skeleton-brand,
+.product-loading .skeleton-stock {
+  width: 150px;
+  height: 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.product-loading .skeleton-description {
+  width: 100%;
+  height: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.product-loading .skeleton-button {
+  width: 150px;
+  height: 40px;
+  border-radius: 8px;
+  margin-top: 30px;
+}
+
+.product-loading .icons_skeleton {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.product-loading .skeleton-icon {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+}

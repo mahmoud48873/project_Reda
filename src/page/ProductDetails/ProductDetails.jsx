@@ -6,7 +6,8 @@ import './ProductDetails.css'
 import { FaCartPlus, FaShare } from "react-icons/fa";
 import { CiHeart } from "react-icons/ci";
 import SilederProduct from "../../components/sliderProducts/SilederProduct";
-
+import Loading from "../../components/loading/Loading";
+import ProductLoading from "../../components/loading/ProductLoading";
 function ProductDetails() {
   const { id } = useParams();
   console.log(id);
@@ -46,7 +47,7 @@ function ProductDetails() {
   }, [product]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <ProductLoading />;
   }
 
   if (!product) {
@@ -97,7 +98,7 @@ function ProductDetails() {
       </div>
     </div> 
     {loadingRelatedProducts?(
-      <p>Loading Related Products...</p>
+      <Loading />
 
     ):(
       <SilederProduct key={product.category}  data={relatedProducts} title={product.category.replace("-"," ")}/>
