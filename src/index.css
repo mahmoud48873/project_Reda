@@ -6,6 +6,14 @@
   margin: 0;
   box-sizing: 0;
 }
+header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 :root {
   --main-color: #0090f0;
   --bg_color: #f3f3f3;

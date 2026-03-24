@@ -15,13 +15,13 @@ const Footer = () => {
               نحن نقدم أفضل المنتجات بجودة عالية وأسعار تنافسية. تسوق معنا الآن واستمتع بتجربة فريدة.
             </p>
             <div className="social-links">
-              <a href="#" target="_blank" rel="noopener noreferrer" className="social-icon facebook">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="social-icon facebook">
                 <FaFacebookF />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="social-icon instagram">
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="social-icon instagram">
                 <FaInstagram />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="social-icon tiktok">
+              <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="social-icon tiktok">
                 <FaTiktok />
               </a>
               <a href="https://wa.me/201280658002" target="_blank" rel="noopener noreferrer" className="social-icon whatsapp">
@@ -59,7 +59,7 @@ const Footer = () => {
               <FaPhoneAlt className="contact-icon" />
               <div className="contact-text">
                 <p>اتصل بنا:</p>
-                <a href="tel:01280658002">01280658002</a>
+                <a href="https://wa.me/201280658002" target="_blank" rel="noopener noreferrer">01280658002</a>
               </div>
             </div>
             <div className="contact-item">

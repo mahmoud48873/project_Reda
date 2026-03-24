@@ -17,6 +17,7 @@
   z-index: 2;
   text-align: left;
 }
+
 .swiper-slide .content h4 {
   font-size: 1vw;
   text-transform: uppercase;
@@ -24,23 +25,50 @@
   margin-bottom: 0.4vw;
   font-weight: normal;
 }
+
 .swiper-slide .content h3 {
   font-size: 3vw;
- text-transform: capitalize;
- margin-bottom: 30px;
- color: #0090f0;
- font-weight: bolder;
- line-height: 1.1;
-
-
- 
-  
+  text-transform: capitalize;
+  margin-bottom: 30px;
+  color: #0090f0;
+  font-weight: bolder;
+  line-height: 1.1;
 }
+
 .swiper-slide .content p {
-    font-size: 1vw;
+  font-size: 1vw;
   text-transform: uppercase;
   font-style: italic;
   margin-bottom: 0.4vw;
   font-weight: normal;
+}
 
+@media (max-width: 768px) {
+  .swiper {
+    height: 300px;
+  }
+
+  .swiper-slide .content {
+    top: 40%;
+    left: 8%;
+  }
+
+  .swiper-slide .content h4 {
+    font-size: 12px;
+  }
+
+  .swiper-slide .content h3 {
+    font-size: 22px;
+    margin-bottom: 5px;
+  }
+
+  .swiper-slide .content p {
+    font-size: 10px;
+    margin-bottom: 10px;
+  }
+
+  .swiper-slide .content .btn {
+    padding: 8px 18px;
+    font-size: 13px;
+  }
 }

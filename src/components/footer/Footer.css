@@ -7,7 +7,6 @@
   overflow: hidden;
 }
 
-
 .footer::before {
   content: "";
   position: absolute;
@@ -94,7 +93,6 @@
   box-shadow: 0 10px 20px rgba(0, 144, 240, 0.3);
 }
 
-
 .social-icon.facebook:hover { background: #1877f2; border-color: #1877f2; box-shadow: 0 10px 20px rgba(24, 119, 242, 0.3); }
 .social-icon.instagram:hover { background: #ff4dff; border-color: #ff4dff; box-shadow: 0 10px 20px rgba(255, 77, 255, 0.3); }
 .social-icon.tiktok:hover { background: #000000; border-color: #333; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); }
@@ -173,41 +171,52 @@
 }
 
 @media (max-width: 640px) {
+  .footer {
+    padding: 40px 0 20px;
+  }
+
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 40px;
+    text-align: center;
   }
   
-  .footer-section.about {
-    text-align: center;
+  .footer-section {
     display: flex;
     flex-direction: column;
     align-items: center;
   }
-  
+
   .footer-desc {
     max-width: 100%;
   }
-  
+
   .footer-section h3::after {
     left: 50%;
     transform: translateX(-50%);
   }
-  
-  .footer-section:hover h3::after {
-    width: 60px;
-    transform: translateX(-50%);
+
+  .social-links {
+    justify-content: center;
   }
-  
-  .footer-section {
+
+  .contact-item {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 25px;
     text-align: center;
   }
-  
-  .contact-item {
-    justify-content: center;
-    text-align: right;
+
+  .contact-icon {
+    margin-top: 0;
+    font-size: 1.5rem;
   }
-  
+
+  .contact-text p {
+    margin-bottom: 5px;
+  }
+
   .footer-section ul li a:hover {
     transform: translateY(-3px);
   }

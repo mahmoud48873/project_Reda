@@ -26,8 +26,8 @@ export default function TopHeader() {
             <span className="count">0</span>
           </div>
           <div className="icon">
-            <IoMdCart />
-            <span className="count">{CartItem.length}</span>
+         <Link to="/cart">   <IoMdCart />
+            <span className="count">{CartItem.length}</span></Link>
           </div>
         </div>
       </div>

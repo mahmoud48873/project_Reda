@@ -8,7 +8,10 @@ import { CiHeart } from "react-icons/ci";
 import SilederProduct from "../../components/sliderProducts/SilederProduct";
 import Loading from "../../components/loading/Loading";
 import ProductLoading from "../../components/loading/ProductLoading";
+import { CartContext } from "../../components/context/CartContext";
+import { useContext } from "react";
 function ProductDetails() {
+  const { addToCart } = useContext(CartContext);
   const { id } = useParams();
   console.log(id);
 
@@ -84,7 +87,7 @@ function ProductDetails() {
           <p className="brand_item">Brand: <span>{product.brand}</span></p>
           <p className="description_item">{product.description}</p>
           <p className="stock_item">Stock: <span>{product.stock}</span></p>
-          <button className="add_to_cart btn btn-primary ">Add to Cart</button>
+          <button className="add_to_cart btn btn-primary " onClick={() => addToCart(product)}>Add to Cart</button>
           <div className="icons">
     
         <span>

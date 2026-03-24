@@ -22,7 +22,7 @@
  
 }
 .poduct {
-  width: 280px;
+  width: 100%;
   background: #ffffff;
   padding: 20px;
   border: 1px solid #eaeaea;
@@ -32,6 +32,33 @@
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .poduct {
+    padding: 10px;
+  }
+
+  .icons {
+    right: 10px;
+    opacity: 1;
+    gap: 8px;
+  }
+
+  .icons span {
+    width: 35px;
+    height: 35px;
+    font-size: 16px;
+  }
+
+  .img_product {
+    height: 150px;
+    margin-bottom: 15px;
+  }
+
+  .price {
+    font-size: 20px;
+  }
 }
 
 .poduct:hover {

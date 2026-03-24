@@ -85,3 +85,31 @@
     color: #ffffff;
     transform: translateY(-3px);
 }
+
+@media (max-width: 768px) {
+  .item_details {
+    padding: 20px 0;
+  }
+
+  .item_details .container {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .item_details .container .img_item {
+    width: 100%;
+  }
+
+  .item_details .details_item {
+    width: 100%;
+  }
+
+  .item_details .details_item h1 {
+    font-size: 24px;
+    margin-bottom: 15px;
+  }
+
+  .item_details .details_item .price_item {
+    font-size: 18px;
+  }
+}
