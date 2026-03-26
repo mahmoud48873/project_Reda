@@ -57,10 +57,10 @@ export default function BtmHeader() {
           </div>
         </nav>
         <div className="header_sign flex gap-4  ">
-          <Link to="/">
+          <Link to="/login">
             <GoSignIn className="text-white text-2xl" />
           </Link>
-          <Link to="/">
+          <Link to="/signup">
             <LuUserRoundPlus className="text-white text-2xl" />
           </Link>
         </div>

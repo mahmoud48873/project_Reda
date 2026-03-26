@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { IoStar } from "react-icons/io5";
 import { IoMdStarHalf } from "react-icons/io";
 import './ProductDetails.css'
-import { FaCartPlus, FaShare } from "react-icons/fa";
+import { FaCartPlus, FaShare, FaHeart, FaWhatsapp, FaFacebook, FaLink } from "react-icons/fa";
 import { CiHeart } from "react-icons/ci";
 import SilederProduct from "../../components/sliderProducts/SilederProduct";
 import Loading from "../../components/loading/Loading";
 import ProductLoading from "../../components/loading/ProductLoading";
 import { CartContext } from "../../components/context/CartContext";
-import { useContext } from "react";
+import { WishlistContext } from "../../components/context/WishlistContext";
 function ProductDetails() {
   const { addToCart } = useContext(CartContext);
+  const { addToWishlist, wishlistItems } = useContext(WishlistContext);
   const { id } = useParams();
   console.log(id);
 
@@ -19,6 +20,7 @@ function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loadingRelatedProducts, setLoadingRelatedProducts] = useState(true);
+  const [showShare, setShowShare] = useState(false);
 
   useEffect(() => {
     const FetchData = async () => {
@@ -90,11 +92,21 @@ function ProductDetails() {
           <button className="add_to_cart btn btn-primary " onClick={() => addToCart(product)}>Add to Cart</button>
           <div className="icons">
     
-        <span>
-          <CiHeart />
+        <span onClick={() => addToWishlist(product)} style={{ color: (product && wishlistItems.some(item => item.id === product.id)) ? "#ff6b6b" : "inherit", cursor: "pointer" }}>
+          {(product && wishlistItems.some(item => item.id === product.id)) ? <FaHeart /> : <CiHeart />}
         </span>
-        <span>
-          <FaShare />
+        <span style={{ position: 'relative', cursor: 'pointer' }}>
+          <FaShare onClick={(e) => { e.preventDefault(); setShowShare(!showShare); }} />
+          {showShare && (
+              <div className="share_menu" style={{
+                  position: 'absolute', right: '40px', top: '50%', transform: 'translateY(-50%)', backgroundColor: 'white', padding: '10px', 
+                  borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', display: 'flex', gap: '15px', zIndex: 10
+              }}>
+                  <FaWhatsapp size={24} color="#25D366" onClick={(e)=> {e.preventDefault(); window.open(`https://wa.me/?text=Check this out: ${window.location.origin}/products/${product.id}`)}}/>
+                  <FaFacebook size={24} color="#1877F2" onClick={(e)=> {e.preventDefault(); window.open(`https://www.facebook.com/sharer/sharer.php?u=${window.location.origin}/products/${product.id}`)}}/>
+                  <FaLink size={24} color="#333" onClick={(e)=> {e.preventDefault(); navigator.clipboard.writeText(`${window.location.origin}/products/${product.id}`); alert('Link copied!')}}/>
+              </div>
+          )}
         </span>
       </div>
         </div>

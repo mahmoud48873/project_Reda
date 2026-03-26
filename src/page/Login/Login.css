@@ -1,0 +1,129 @@
+.login_page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    background-color: #f4f4f4;
+    padding: 40px 20px;
+}
+
+.login_container {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+}
+
+.login_container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 26px;
+    font-weight: 600;
+}
+
+.form_group {
+    margin-bottom: 20px;
+}
+
+.form_group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: 500;
+}
+
+.form_group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.form_group input:focus {
+    border-color: #0090f0;
+}
+
+.login_btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #0090f0;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+.login_btn:hover {
+    background-color: #007bc0;
+}
+
+.register_link {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+}
+
+.register_link a {
+    color: #0090f0;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login_link a {
+    color: #0090f0;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login_link a:hover {
+    text-decoration: underline;
+}
+
+.beautiful_error_box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: linear-gradient(135deg, #fff3f3 0%, #ffe6e6 100%);
+    border-left: 5px solid #ff4b4b;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 10px rgba(255, 75, 75, 0.1);
+    animation: shakeError 0.5s ease-in-out;
+}
+
+.error_icon {
+    font-size: 35px;
+    color: #ff4b4b;
+    flex-shrink: 0;
+}
+
+.error_content h4 {
+    margin: 0 0 5px 0;
+    color: #d12c2c;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.error_content p {
+    margin: 0;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+@keyframes shakeError {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
