@@ -9,8 +9,13 @@ function Category() {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+    const [prevCategoryName, setPrevCategoryName] = useState(categoryName);
+    if (categoryName !== prevCategoryName) {
+        setPrevCategoryName(categoryName);
         setLoading(true);
+    }
+
+    useEffect(() => {
         fetch(`https://dummyjson.com/products/category/${categoryName}`)
             .then(res => res.json())
             .then(data => {

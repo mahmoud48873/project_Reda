@@ -27,7 +27,7 @@ export default function BtmHeader() {
   }, []);
   console.log(category);
   return (
-    <div className="btm_header bg-[#0090f0] ">
+    <div className="btm_header bg-[var(--main-color)] transition-colors duration-300">
       <div className="container flex items-center justify-between">
         <nav className="nav flex items-center">
           <div className="category_nav ">

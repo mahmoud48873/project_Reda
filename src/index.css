@@ -10,8 +10,9 @@ header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background-color: white;
+  background-color: var(--white_color);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s;
 }
 
 :root {
@@ -20,11 +21,30 @@ header {
   --white_color: #fff;
   --color_heading: #253237;
   --border_color: #d6d6d6d5;
+  --footer_text: #fff;
+  --footer_p: #a0aec0;
 }
-body {
-  background: white;
-  font-family: "Inter", sans-serif;
 
+body.dark {
+  --main-color: #000;
+  --bg_color: #242424;
+  --white_color: #121212;
+  --color_heading: #f3f3f3;
+  --border_color: #333333;
+  --footer_text: #000;
+  --footer_p: #333;
+}
+
+body.dark .price,
+body.dark .price span {
+  color: #fff;
+}
+
+body {
+  background-color: var(--white_color);
+  color: var(--color_heading);
+  font-family: "Inter", sans-serif;
+  transition: background-color 0.3s, color 0.3s;
 }
 img {
   width: 100%;

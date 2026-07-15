@@ -1,14 +1,14 @@
 .contact_page {
     padding: 60px 0;
     min-height: 60vh;
-    background-color: #fcfcfc;
+    background-color: var(--bg_color);
 }
 
 .page_title {
     text-align: center;
     font-size: 36px;
     font-weight: 700;
-    color: #333;
+    color: var(--color_heading);
     margin-bottom: 50px;
     position: relative;
     padding-bottom: 15px;
@@ -19,7 +19,7 @@
     position: absolute;
     width: 60px;
     height: 4px;
-    background-color: #0090f0;
+    background-color: var(--main-color);
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
@@ -42,11 +42,11 @@
 .contact_info h3 {
     font-size: 24px;
     margin-bottom: 20px;
-    color: #333;
+    color: var(--color_heading);
 }
 
 .contact_info p {
-    color: #555;
+    color: var(--p_color, #555);
     margin-bottom: 20px;
     line-height: 1.6;
 }
@@ -58,11 +58,11 @@
 
 .contact_info ul li {
     margin-bottom: 15px;
-    color: #444;
+    color: var(--color_heading);
 }
 
 .contact_info ul li strong {
-    color: #0090f0;
+    color: var(--main-color);
 }
 
 .form_group {
@@ -72,21 +72,23 @@
 .form_group input, .form_group textarea {
     width: 100%;
     padding: 15px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border_color);
     border-radius: 8px;
     font-size: 16px;
     outline: none;
+    background-color: var(--bg_color);
+    color: var(--color_heading);
     transition: border-color 0.3s;
 }
 
 .form_group input:focus, .form_group textarea:focus {
-    border-color: #0090f0;
+    border-color: var(--main-color);
 }
 
 .submit_btn {
     padding: 15px 30px;
-    background-color: #0090f0;
-    color: #fff;
+    background-color: var(--main-color);
+    color: var(--white_color);
     border: none;
     border-radius: 8px;
     font-size: 16px;

@@ -1,14 +1,14 @@
 .static_page {
     padding: 60px 0;
     min-height: 60vh;
-    background-color: #fcfcfc;
+    background-color: var(--bg_color);
 }
 
 .static_page .page_title {
     text-align: center;
     font-size: 36px;
     font-weight: 700;
-    color: #333;
+    color: var(--color_heading);
     margin-bottom: 40px;
     position: relative;
     padding-bottom: 15px;
@@ -19,7 +19,7 @@
     position: absolute;
     width: 60px;
     height: 4px;
-    background-color: #0090f0;
+    background-color: var(--main-color);
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
@@ -31,7 +31,7 @@
     margin: 0 auto;
     text-align: center;
     line-height: 1.8;
-    color: #555;
+    color: var(--color_heading);
     font-size: 18px;
 }
 

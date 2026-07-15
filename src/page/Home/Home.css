@@ -30,7 +30,7 @@
   font-size: 3vw;
   text-transform: capitalize;
   margin-bottom: 30px;
-  color: #0090f0;
+  color: var(--main-color);
   font-weight: bolder;
   line-height: 1.1;
 }

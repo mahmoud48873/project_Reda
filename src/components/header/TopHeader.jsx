@@ -1,10 +1,10 @@
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaMoon, FaSun } from "react-icons/fa";
 import { CiHeart } from "react-icons/ci";
 import { IoMdCart } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../img/logo.png";
 import "./header.css";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { CartContext } from "../context/CartContext";
 import { WishlistContext } from "../context/WishlistContext";
 export default function TopHeader() {
@@ -12,6 +12,20 @@ export default function TopHeader() {
   const {wishlistItems} = useContext(WishlistContext);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem("theme") === "dark";
+  });
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.body.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDarkMode]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -39,7 +53,10 @@ export default function TopHeader() {
             <FaSearch className="text-white" />
           </button>
         </form>
-        <div className="header">
+        <div className="header items-center">
+          <div className="icon flex items-center justify-center" onClick={() => setIsDarkMode(!isDarkMode)}>
+            {isDarkMode ? <FaSun className="text-yellow-400" /> : <FaMoon />}
+          </div>
           <div className="icon">
           <Link to="/wishlist">
             <CiHeart />

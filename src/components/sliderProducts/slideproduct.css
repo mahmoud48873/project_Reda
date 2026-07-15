@@ -10,12 +10,12 @@
     position: absolute;
     width: 100px;
     height: 2px;
-    background: #0090f0;
+    background: var(--main-color);
     bottom: -1px;
 }
 .top_slide h2{
     font-size: 30px;
-    color: #0090f0;
+    color: var(--main-color);
     font-weight: 600;
     margin-bottom: 10px;
     text-transform: capitalize;
@@ -23,9 +23,9 @@
 }
 .poduct {
   width: 100%;
-  background: #ffffff;
+  background: var(--white_color);
   padding: 20px;
-  border: 1px solid #eaeaea;
+  border: 1px solid var(--border_color);
   border-radius: 12px;
   transition: all 0.3s ease;
   cursor: pointer;
@@ -108,7 +108,7 @@
 
 .name_product_title {
   font-size: 18px;
-  color: #333;
+  color: var(--color_heading);
   font-weight: 500;
   margin: 0 0 8px 0;
   text-align: left;
@@ -116,7 +116,7 @@
 
 .name_product {
   font-size: 13px;
-  color: #777;
+  color: var(--p_color, #777);
   margin: 0 0 15px 0;
   line-height: 1.5;
   display: -webkit-box;
@@ -138,7 +138,7 @@
 
 .price {
   font-size: 24px;
-  color: #0090f0;
+  color: var(--main-color);
   font-weight: 700;
   margin: 0;
   text-align: left;
@@ -168,8 +168,8 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #ffffff;
-  color: #444;
+  background: var(--white_color);
+  color: var(--color_heading);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -179,13 +179,13 @@
   transition: all 0.3s ease;
 }
 .poduct.added .icons .add{
-  background: #0090f0;
+  background: var(--main-color);
   color: #ffffff;
  
 }
 
 .icons span:hover {
-  background: #0090f0;
+  background: var(--main-color);
   color: #ffffff;
   transform: translateY(-2px);
 }

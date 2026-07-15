@@ -5,22 +5,29 @@ import Loading from '../../components/loading/Loading';
 import './Search.css';
 
 function Search() {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
     const location = useLocation();
     
     // Extract search query from URL
     const queryParams = new URLSearchParams(location.search);
     const query = queryParams.get('q') || '';
 
-    useEffect(() => {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(!!query);
+    
+    const [prevQuery, setPrevQuery] = useState(query);
+    if (query !== prevQuery) {
+        setPrevQuery(query);
         if (!query) {
             setProducts([]);
             setLoading(false);
-            return;
+        } else {
+            setLoading(true);
         }
+    }
+
+    useEffect(() => {
+        if (!query) return;
         
-        setLoading(true);
         fetch(`https://dummyjson.com/products/search?q=${query}`)
             .then(res => res.json())
             .then(data => {
