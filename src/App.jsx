@@ -14,6 +14,12 @@ import About from "./page/About/About";
 import Accessories from "./page/Accessories/Accessories";
 import Blog from "./page/Blog/Blog";
 import Contact from "./page/Contact/Contact";
+import Checkout from "./page/Checkout/Checkout";
+import OrderSuccess from "./page/OrderSuccess/OrderSuccess";
+import Dashboard from "./page/Dashboard/Dashboard";
+import Compare from "./page/Compare/Compare";
+import CompareBar from "./components/compare/CompareBar";
+
 function App() {
   return (
     <>
@@ -23,22 +29,28 @@ function App() {
       </header>
 
       <Routes>
-        <Route path="/" element={<Home />}></Route>
-        <Route path="/cart" element={<Cart />}></Route>
-        <Route path="/wishlist" element={<Wishlist />}></Route>
-        <Route path="/login" element={<Login />}></Route>
-        <Route path="/signup" element={<SignUp />}></Route>
-        <Route path="/search" element={<Search />}></Route>
-        <Route path="/category/:categoryName" element={<Category />}></Route>
-        <Route path="/about" element={<About />}></Route>
-        <Route path="/accessories" element={<Accessories />}></Route>
-        <Route path="/blog" element={<Blog />}></Route>
-        <Route path="/contact" element={<Contact />}></Route>
-        <Route path="/products/:id" element={<ProductDetails />}></Route>
+        <Route path="/" element={<Home />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/category/:categoryName" element={<Category />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/accessories" element={<Accessories />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/products/:id" element={<ProductDetails />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/order-success" element={<OrderSuccess />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/compare" element={<Compare />} />
       </Routes>
 
+      <CompareBar />
       <Footer />
     </>
   );
 }
+
 export default App;

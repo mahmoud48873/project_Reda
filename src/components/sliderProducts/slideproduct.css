@@ -206,3 +206,33 @@
 .poduct .stat_cart svg{
   color:rgb(31, 168, 13);
 }
+
+/* Dark Mode Product Card Improvements */
+body.dark .poduct {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+body.dark .poduct:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  border-color: #0090f0;
+}
+
+body.dark .icons span {
+  background: #0f172a;
+  color: #f8fafc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+body.dark .icons span:hover {
+  background: #0090f0;
+  color: #ffffff;
+}
+
+body.dark .name_product {
+  color: #94a3b8;
+}
+
+body.dark .top_slide {
+  border-bottom-color: #334155;
+}

@@ -1,30 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { CartContext } from './CartContext';
+import { ToastContext } from './ToastContext';
 
 export default function CartProvider({ children }) {
-
     const [CartItem, setCartItem] = useState(() => {
         const getCartItem = localStorage.getItem("cartItem");
         return getCartItem ? JSON.parse(getCartItem) : [];
     });
 
-    const [showNotification, setShowNotification] = useState(false);
-    const [notificationMessage, setNotificationMessage] = useState("");
+    const toastCtx = useContext(ToastContext);
 
     const addToCart = (product) => {
-        setCartItem((prevItems) => {
-            const isProductInCart = prevItems.find((item) => item.id === product.id);
-            if (isProductInCart) {
-                setNotificationMessage(`${product.title} is already in the cart!`);
-                return prevItems;
-            }
-            
-            setNotificationMessage(`${product.title} added to cart!`);
-            return [...prevItems, { ...product, quantity: 1 }];
-        });
-
-        setShowNotification(true);
-        setTimeout(() => setShowNotification(false), 3000);
+        const isProductInCart = CartItem.some((item) => item.id === product.id);
+        if (isProductInCart) {
+            toastCtx?.showToast(`${product.title} is already in cart!`, 'info');
+        } else {
+            setCartItem((prevItems) => [...prevItems, { ...product, quantity: 1 }]);
+            toastCtx?.showToast(`${product.title} added to cart!`, 'success');
+        }
     };
 
     const removeFromCart = (id) => {
@@ -49,35 +42,17 @@ export default function CartProvider({ children }) {
         );
     };
 
+    const clearCart = () => {
+        setCartItem([]);
+    };
+
     useEffect(() => {
         localStorage.setItem("cartItem", JSON.stringify(CartItem));
     }, [CartItem]);
 
     return (
-        <CartContext.Provider value={{ CartItem, addToCart, removeFromCart, increaseQuantity, decreaseQuantity }}>
+        <CartContext.Provider value={{ CartItem, addToCart, removeFromCart, increaseQuantity, decreaseQuantity, clearCart }}>
             {children}
-            {showNotification && (
-                <div style={{
-                    position: 'fixed',
-                    top: '20px',
-                    right: '20px',
-                    backgroundColor: '#007bff',
-                    color: 'white',
-                    padding: '15px 25px',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                    zIndex: 9999,
-                    animation: 'slideIn 0.3s ease-out'
-                }}>
-                    <style>{`
-                        @keyframes slideIn {
-                            from { transform: translateX(100%); opacity: 0; }
-                            to { transform: translateX(0); opacity: 1; }
-                        }
-                    `}</style>
-                    {notificationMessage}
-                </div>
-            )}
         </CartContext.Provider>
     );
 }

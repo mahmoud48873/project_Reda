@@ -1,70 +1,279 @@
-import { useState } from "react";
-import { useEffect } from "react";
-import { IoMdMenu } from "react-icons/io";
-import { IoIosArrowDown } from "react-icons/io";
-import { Link , useLocation} from "react-router-dom";
+import { useState, useEffect, useContext, useRef } from "react";
+import { IoMdMenu, IoIosArrowDown } from "react-icons/io";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { GoSignIn } from "react-icons/go";
 import { LuUserRoundPlus } from "react-icons/lu";
+import { FaUser, FaSignOutAlt, FaTachometerAlt, FaTimes, FaFilter, FaHome, FaInfoCircle, FaLaptop, FaNewspaper, FaEnvelope, FaSearch, FaGlobe } from "react-icons/fa";
 import "./header.css";
-
-const NavLinks = [
-  { title: "Home", link: "/" },
-  { title: "About", link: "/about" },
-  { title: "Accessories", link: "/accessories" },
-  { title: "Blog", link: "/blog" },
-  { title: "Contact", link: "/contact" },
-];
+import { UserContext } from "../context/UserContext";
+import { ToastContext } from "../context/ToastContext";
+import { LanguageContext } from "../context/LanguageContext";
 
 export default function BtmHeader() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [category, setCategory] = useState([]);
-  const[isCategoryOpen , setIsCategoryOpen] = useState(false);
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  
+  // Sidebar filter states
+  const [sidebarMaxPrice, setSidebarMaxPrice] = useState(1500);
+  const [sidebarCategory, setSidebarCategory] = useState("");
+
+  const { user, logout } = useContext(UserContext);
+  const { showToast } = useContext(ToastContext);
+  const { language, toggleLanguage, t } = useContext(LanguageContext) || {};
+  const userMenuRef = useRef(null);
+
+  const NavLinks = [
+    { title: t?.('home') || "Home", link: "/", icon: <FaHome /> },
+    { title: t?.('about') || "About", link: "/about", icon: <FaInfoCircle /> },
+    { title: t?.('accessories') || "Accessories", link: "/accessories", icon: <FaLaptop /> },
+    { title: t?.('blog') || "Blog", link: "/blog", icon: <FaNewspaper /> },
+    { title: t?.('contact') || "Contact", link: "/contact", icon: <FaEnvelope /> },
+  ];
 
   useEffect(() => {
     fetch("https://dummyjson.com/products/categories")
       .then((res) => res.json())
       .then((data) => setCategory(data));
   }, []);
-  console.log(category);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    showToast(language === 'ar' ? 'تم تسجيل الخروج بنجاح 👋' : 'Logged out. See you soon! 👋', 'info');
+    setIsUserMenuOpen(false);
+    navigate('/');
+  };
+
+  const handleApplySidebarFilter = (e) => {
+    e.preventDefault();
+    setIsSidebarOpen(false);
+    if (sidebarCategory) {
+      navigate(`/category/${sidebarCategory}`);
+    } else {
+      navigate(`/search?q=a`);
+    }
+    showToast(language === 'ar' ? `فلترة المنتجات حتى $${sidebarMaxPrice}` : `Filtering products up to $${sidebarMaxPrice}`, 'info');
+  };
+
   return (
-    <div className="btm_header bg-[var(--main-color)] transition-colors duration-300">
-      <div className="container flex items-center justify-between">
-        <nav className="nav flex items-center">
-          <div className="category_nav ">
-            <div className="category_btm  text-white text-[15px] font-semibold"onClick={()=>setIsCategoryOpen(!isCategoryOpen)}>
-              <IoMdMenu />
-              <p>Browse Category</p> 
-              <IoIosArrowDown />
-            </div>
-            <div className={`category_nav_list ${isCategoryOpen ? "active" : ""}`}>
-              {category.map((cat) => (
-                <Link
-                  key={cat.slug}
-                  to={`/category/${cat.slug}`}
-                  onClick={() => setIsCategoryOpen(false)}
+    <>
+      <div className="btm_header bg-(--main-color) transition-colors duration-300">
+        <div className="container flex items-center justify-between">
+          <nav className="nav flex items-center">
+            <div className="category_nav">
+              <div className="category_btm">
+                <button
+                  type="button"
+                  className="hamburger_btn_icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsSidebarOpen(true);
+                  }}
+                  title="Open Side Menu & Filters"
                 >
-                  {cat.name}
-                </Link>
+                  <IoMdMenu />
+                </button>
+
+                <div
+                  className="category_title_wrap"
+                  onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                >
+                  <p className="category_text_white">{t?.('browseCategory') || "Browse Category"}</p>
+                  <IoIosArrowDown className={`category_arrow ${isCategoryOpen ? 'rotated' : ''}`} />
+                </div>
+              </div>
+
+              {/* Category Dropdown List */}
+              <div className={`category_nav_list ${isCategoryOpen ? "active" : ""}`}>
+                {category.map((cat) => (
+                  <Link
+                    key={cat.slug}
+                    to={`/category/${cat.slug}`}
+                    onClick={() => setIsCategoryOpen(false)}
+                  >
+                    {cat.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop Nav Links */}
+            <div className="nav_links flex items-center">
+              {NavLinks.map((item, index) => (
+                <span key={index} className={location.pathname === item.link ? "active" : ""}>
+                  <Link to={item.link}>{item.title}</Link>
+                </span>
               ))}
             </div>
+          </nav>
+
+          {/* User Sign / Profile */}
+          <div className="header_sign flex gap-4">
+            {user ? (
+              <div className="user_menu_wrap" ref={userMenuRef}>
+                <div className="user_avatar_btn" onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>
+                  <img src={user.avatar} alt={user.name} className="user_avatar_img" />
+                  <span className="user_name_header">{user.name.split(' ')[0]}</span>
+                  <IoIosArrowDown className={`user_arrow ${isUserMenuOpen ? 'rotated' : ''}`} />
+                </div>
+                {isUserMenuOpen && (
+                  <div className="user_dropdown">
+                    <div className="user_dropdown_info">
+                      <img src={user.avatar} alt={user.name} />
+                      <div>
+                        <strong>{user.name}</strong>
+                        <p>{user.email}</p>
+                      </div>
+                    </div>
+                    <hr />
+                    <Link to="/dashboard" onClick={() => setIsUserMenuOpen(false)}>
+                      <FaTachometerAlt /> {t?.('dashboard') || "Dashboard"}
+                    </Link>
+                    <button onClick={handleLogout}>
+                      <FaSignOutAlt /> {t?.('logout') || "Logout"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link to="/login" title={t?.('signIn') || "Sign In"}>
+                  <GoSignIn className="text-white text-2xl" />
+                </Link>
+                <Link to="/signup" title={t?.('signUp') || "Sign Up"}>
+                  <LuUserRoundPlus className="text-white text-2xl" />
+                </Link>
+              </>
+            )}
           </div>
-          <div className="nav_links flex items-center  ">
-            {NavLinks.map((item,index) => (
-              <span className={location.pathname === item.link ? "active" : ""}><Link key={index} to={item.link}>
-                {item.title}
-              </Link></span>
-            ))}
-          </div>
-        </nav>
-        <div className="header_sign flex gap-4  ">
-          <Link to="/login">
-            <GoSignIn className="text-white text-2xl" />
-          </Link>
-          <Link to="/signup">
-            <LuUserRoundPlus className="text-white text-2xl" />
-          </Link>
         </div>
       </div>
-    </div>
+
+      {/* Off-canvas Sidebar Drawer */}
+      {isSidebarOpen && (
+        <div className="sidebar_overlay" onClick={() => setIsSidebarOpen(false)}>
+          <div className="sidebar_drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="sidebar_header">
+              <h3>{t?.('navigation') || "Navigation & Account"}</h3>
+              <button className="sidebar_close_btn" onClick={() => setIsSidebarOpen(false)}>
+                <FaTimes />
+              </button>
+            </div>
+
+            {/* 1. Account Auth Section FIRST (تسجيل الدخول أولاً في الأعلى) */}
+            <div className="sidebar_section sidebar_auth_section">
+              <h4 className="sidebar_subtitle"><FaUser /> {t?.('account') || "Account"}</h4>
+              {user ? (
+                <div className="sidebar_user_card">
+                  <div className="sidebar_user_info">
+                    <img src={user.avatar} alt={user.name} />
+                    <div>
+                      <strong>{user.name}</strong>
+                      <p>{user.email}</p>
+                    </div>
+                  </div>
+                  <div className="sidebar_auth_btns">
+                    <Link to="/dashboard" className="sidebar_auth_btn profile" onClick={() => setIsSidebarOpen(false)}>
+                      <FaTachometerAlt /> {t?.('dashboard') || "Dashboard"}
+                    </Link>
+                    <button className="sidebar_auth_btn logout" onClick={() => { handleLogout(); setIsSidebarOpen(false); }}>
+                      <FaSignOutAlt /> {t?.('logout') || "Logout"}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="sidebar_auth_btns">
+                  <Link to="/login" className="sidebar_auth_btn login" onClick={() => setIsSidebarOpen(false)}>
+                    <GoSignIn /> {t?.('signIn') || "Sign In (تسجيل الدخول)"}
+                  </Link>
+                  <Link to="/signup" className="sidebar_auth_btn signup" onClick={() => setIsSidebarOpen(false)}>
+                    <LuUserRoundPlus /> {t?.('signUp') || "Create Account (إنشاء حساب)"}
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Language Switcher Button in Sidebar */}
+            <div className="sidebar_section">
+              <button className="sidebar_lang_btn" onClick={toggleLanguage}>
+                <FaGlobe /> {language === 'ar' ? 'Switch to English' : 'التحويل إلى العربية'}
+              </button>
+            </div>
+
+            {/* 2. Navigation Links Section (ثانياً الروابط الرئيسية) */}
+            <div className="sidebar_section">
+              <h4 className="sidebar_subtitle">{t?.('mainPages') || "Main Pages"}</h4>
+              <ul className="sidebar_nav_list">
+                {NavLinks.map((item, index) => (
+                  <li key={index}>
+                    <Link
+                      to={item.link}
+                      className={location.pathname === item.link ? "active" : ""}
+                      onClick={() => setIsSidebarOpen(false)}
+                    >
+                      <span className="nav_icon_wrap">{item.icon}</span>
+                      <span>{item.title}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* 3. Quick Search & Filter Section */}
+            <div className="sidebar_section filter_section">
+              <h4 className="sidebar_subtitle"><FaFilter /> {t?.('quickFilters') || "Quick Filters"}</h4>
+              <form onSubmit={handleApplySidebarFilter}>
+                <div className="sidebar_filter_group">
+                  <label>{t?.('maxPriceLimit') || "Max Price Limit"}: <strong>${sidebarMaxPrice}</strong></label>
+                  <input
+                    type="range"
+                    min="10"
+                    max="2000"
+                    step="10"
+                    value={sidebarMaxPrice}
+                    onChange={(e) => setSidebarMaxPrice(Number(e.target.value))}
+                    className="sidebar_price_slider"
+                  />
+                  <div className="price_range_labels">
+                    <span>$10</span>
+                    <span>$2000</span>
+                  </div>
+                </div>
+
+                <div className="sidebar_filter_group">
+                  <label>{t?.('productCategory') || "Product Category"}</label>
+                  <select
+                    value={sidebarCategory}
+                    onChange={(e) => setSidebarCategory(e.target.value)}
+                  >
+                    <option value="">{t?.('allCategories') || "All Categories"}</option>
+                    {category.map(cat => (
+                      <option key={cat.slug} value={cat.slug}>{cat.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <button type="submit" className="sidebar_filter_submit_btn">
+                  <FaSearch /> {t?.('applyFilters') || "Apply Filters"}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

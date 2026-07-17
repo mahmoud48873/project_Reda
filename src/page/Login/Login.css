@@ -10,18 +10,41 @@
 .login_container {
     background-color: #fff;
     padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 450px;
 }
 
-.login_container h2 {
+.login_header {
     text-align: center;
     margin-bottom: 30px;
+}
+
+.login_icon_wrap {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #0090f0, #0060c0);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    color: white;
+    font-size: 22px;
+    box-shadow: 0 4px 15px rgba(0, 144, 240, 0.35);
+}
+
+.login_container h2 {
     color: #333;
     font-size: 26px;
-    font-weight: 600;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.login_subtitle {
+    color: #888;
+    font-size: 14px;
 }
 
 .form_group {
@@ -38,54 +61,105 @@
 .form_group input {
     width: 100%;
     padding: 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 16px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
     outline: none;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background: #fafafa;
+    box-sizing: border-box;
 }
 
 .form_group input:focus {
     border-color: #0090f0;
+    box-shadow: 0 0 0 3px rgba(0,144,240,0.12);
+    background: #fff;
+}
+
+.password_wrap {
+    position: relative;
+}
+
+.password_wrap input {
+    padding-right: 46px;
+}
+
+.toggle_password {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #999;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.toggle_password:hover {
+    color: #0090f0;
 }
 
 .login_btn {
     width: 100%;
     padding: 14px;
-    background-color: #0090f0;
+    background: linear-gradient(135deg, #0090f0, #0060c0);
     color: #fff;
     border: none;
-    border-radius: 6px;
-    font-size: 18px;
-    font-weight: bold;
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s;
     margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 50px;
 }
 
-.login_btn:hover {
-    background-color: #007bc0;
+.login_btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0080d0, #0050a0);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0,144,240,0.35);
 }
 
-.register_link {
+.login_btn:disabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+}
+
+.btn_spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.register_link, .login_link {
     text-align: center;
     margin-top: 20px;
     color: #666;
 }
 
-.register_link a {
+.register_link a, .login_link a {
     color: #0090f0;
     text-decoration: none;
     font-weight: 600;
 }
 
-.login_link a {
-    color: #0090f0;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.login_link a:hover {
+.register_link a:hover, .login_link a:hover {
     text-decoration: underline;
 }
 
@@ -127,3 +201,16 @@
     20%, 60% { transform: translateX(-5px); }
     40%, 80% { transform: translateX(5px); }
 }
+
+/* Dark Mode */
+body.dark .login_page { background-color: var(--bg_color); }
+body.dark .login_container { background-color: var(--white_color); border: 1px solid var(--border_color); }
+body.dark .login_container h2 { color: var(--color_heading); }
+body.dark .login_subtitle { color: #aaa; }
+body.dark .form_group label { color: #bbb; }
+body.dark .form_group input { background: #1a1a1a; border-color: var(--border_color); color: #eee; }
+body.dark .form_group input:focus { background: #222; border-color: #0090f0; }
+body.dark .toggle_password { color: #777; }
+body.dark .register_link, body.dark .login_link { color: #aaa; }
+body.dark .beautiful_error_box { background: linear-gradient(135deg, #2a1010, #3a1515); }
+body.dark .error_content p { color: #ccc; }
