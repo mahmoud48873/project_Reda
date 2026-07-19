@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import Product from '../../components/sliderProducts/Product';
 import Loading from '../../components/loading/Loading';
 import ProductFilters from '../../components/filters/ProductFilters';
+import { LanguageContext } from '../../components/context/LanguageContext';
 import './Category.css';
 
 function Category() {
     const { categoryName } = useParams();
+    const { t, tCategory } = useContext(LanguageContext) || {};
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -65,15 +67,17 @@ function Category() {
         return <Loading />;
     }
 
+    const categoryTitleTranslated = tCategory ? tCategory(categoryName) : categoryName.replace('-', ' ');
+
     return (
         <div className='category_page'>
             <div className="container">
                 <div className="category_header_wrap">
                     <h1 className='category_title'>
-                        {categoryName.replace('-', ' ').toUpperCase()} PRODUCTS
+                        {categoryTitleTranslated}
                     </h1>
                     <span className="products_count_badge">
-                        Showing {filteredProducts.length} of {products.length} items
+                        {filteredProducts.length} / {products.length}
                     </span>
                 </div>
 
@@ -97,9 +101,8 @@ function Category() {
                     <main className="category_main_content">
                         {filteredProducts.length === 0 ? (
                             <div className="no_results_card">
-                                <h3>No products match your filters</h3>
-                                <p>Try adjusting your price slider, rating filter, or brand selection.</p>
-                                <button className="btn btn-primary" onClick={handleReset}>Clear Filters</button>
+                                <h3>{t ? t('noProductsFound') : 'No products match your filters'}</h3>
+                                <button className="btn btn-primary" onClick={handleReset}>{t ? t('reset') : 'Clear Filters'}</button>
                             </div>
                         ) : (
                             <div className='category_grid'>

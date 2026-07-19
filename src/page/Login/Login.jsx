@@ -12,9 +12,15 @@ function Login() {
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const { login, getUser } = useContext(UserContext);
+    const { user, login } = useContext(UserContext);
     const { showToast } = useContext(ToastContext);
     const navigate = useNavigate();
+
+    React.useEffect(() => {
+        if (user) {
+            navigate('/', { replace: true });
+        }
+    }, [user, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -26,25 +32,24 @@ function Login() {
         }
 
         setIsLoading(true);
-        await new Promise(res => setTimeout(res, 800)); // simulate network
 
-        const existingUser = getUser(email);
-        if (!existingUser) {
-            setError("We couldn't find an account with this email. Please sign up first.");
+        try {
+            const loggedUser = await login(email, password);
+            showToast(`Welcome back, ${loggedUser?.name || 'Customer'}! 👋`, 'success');
             setIsLoading(false);
-            return;
-        }
-
-        if (existingUser.password !== password) {
-            setError("Incorrect password. Please try again.");
+            navigate('/', { replace: true });
+        } catch (err) {
             setIsLoading(false);
-            return;
+            if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+                setError("We couldn't find an account matching these credentials.");
+            } else if (err.code === 'auth/wrong-password') {
+                setError("Incorrect password. Please try again.");
+            } else if (err.code === 'auth/too-many-requests') {
+                setError("Too many failed attempts. Please try again later.");
+            } else {
+                setError(err.message || "Failed to log in. Please check your connection.");
+            }
         }
-
-        login(existingUser);
-        showToast(`Welcome back, ${existingUser.name}! 👋`, 'success');
-        setIsLoading(false);
-        navigate('/');
     };
 
     return (

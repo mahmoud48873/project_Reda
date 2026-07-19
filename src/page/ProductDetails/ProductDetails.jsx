@@ -13,6 +13,7 @@ import { WishlistContext } from "../../components/context/WishlistContext";
 import { CompareContext } from "../../components/context/CompareContext";
 import { ToastContext } from "../../components/context/ToastContext";
 import { UserContext } from "../../components/context/UserContext";
+import { LanguageContext } from "../../components/context/LanguageContext";
 
 function renderStars(rating = 5) {
   const stars = [];
@@ -37,6 +38,7 @@ function ProductDetails() {
   const { addToCompare, isInCompare } = useContext(CompareContext) || {};
   const { showToast } = useContext(ToastContext) || {};
   const { user } = useContext(UserContext) || {};
+  const { t, language, tCategory } = useContext(LanguageContext) || {};
   const { id } = useParams();
 
   const [product, setProduct] = useState(null);
@@ -45,6 +47,7 @@ function ProductDetails() {
   const [loadingRelatedProducts, setLoadingRelatedProducts] = useState(true);
   const [showShare, setShowShare] = useState(false);
   const [activeImage, setActiveImage] = useState("");
+  const [isPaused, setIsPaused] = useState(false);
 
   // Reviews state
   const [reviews, setReviews] = useState([]);
@@ -74,6 +77,21 @@ function ProductDetails() {
   }, [id]);
 
   useEffect(() => {
+    if (!product?.images || product.images.length <= 1 || isPaused) return;
+
+    const timer = setInterval(() => {
+      setActiveImage((prevImg) => {
+        const images = product.images;
+        const currentIndex = images.indexOf(prevImg);
+        const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % images.length;
+        return images[nextIndex];
+      });
+    }, 2000);
+
+    return () => clearInterval(timer);
+  }, [product, isPaused]);
+
+  useEffect(() => {
     if (!product) return;
     fetch(`https://dummyjson.com/products/category/${product.category}`)
       .then(res => res.json())
@@ -89,9 +107,9 @@ function ProductDetails() {
 
   const handleAddReview = (e) => {
     e.preventDefault();
-    const nameToUse = reviewerName.trim() || user?.name || "Anonymous Customer";
+    const nameToUse = reviewerName.trim() || user?.name || (language === 'ar' ? "عميل" : "Anonymous Customer");
     if (!newComment.trim()) {
-      showToast?.("Please write a comment for your review", "error");
+      showToast?.(t ? t('writeCommentPrompt') : "Please write a comment for your review", "error");
       return;
     }
 
@@ -105,7 +123,7 @@ function ProductDetails() {
     setReviews([reviewObj, ...reviews]);
     setNewComment("");
     setReviewerName("");
-    showToast?.("Thank you! Your review has been added.", "success");
+    showToast?.(t ? t('reviewSubmitted') : "Thank you! Your review has been added.", "success");
   };
 
   if (loading) {
@@ -113,16 +131,29 @@ function ProductDetails() {
   }
 
   if (!product) {
-    return <div className="container" style={{ padding: "60px 0", textAlign: "center" }}>Product not found</div>;
+    return <div className="container" style={{ padding: "60px 0", textAlign: "center" }}>{t ? t('productNotFound') : "Product not found"}</div>;
   }
 
   const isCompared = isInCompare ? isInCompare(product.id) : false;
+
+  const getStockStatusText = () => {
+    if (product.stock > 0) {
+      return t ? t('inStock') : "In Stock";
+    }
+    return t ? t('outOfStock') : "Out of Stock";
+  };
 
   return (
     <div className="product_details_page">
       <div className="item_details">
         <div className="container">
-          <div className="img_item">
+          <div
+            className="img_item"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onTouchStart={() => setIsPaused(true)}
+            onTouchEnd={() => setIsPaused(false)}
+          >
             <div className="bag_img">
               <img id="bag_img" src={activeImage || product.images?.[0] || product.thumbnail} alt={product.title} />
             </div>
@@ -145,34 +176,34 @@ function ProductDetails() {
             <div className="rating_wrap">
               <div className="starts">{renderStars(product.rating || 4.5)}</div>
               <span className="rating_num">({product.rating?.toFixed(1) || 4.5})</span>
-              <span className="review_count">• {reviews.length} reviews</span>
+              <span className="review_count">• {reviews.length} {t ? t('reviewsCountLabel') : 'reviews'}</span>
             </div>
 
             <p className="price_item">
               ${product.price}
               {product.discountPercentage > 0 && (
-                <span className="discount_tag">-{Math.round(product.discountPercentage)}% OFF</span>
+                <span className="discount_tag">-{Math.round(product.discountPercentage)}% {t ? t('off') : 'OFF'}</span>
               )}
             </p>
 
             <p className="availability_item">
-              Availability: <span className={product.stock > 0 ? "in_stock" : "out_stock"}>{product.availabilityStatus || (product.stock > 0 ? "In Stock" : "Out of Stock")}</span>
+              {t ? t('availabilityLabel') : 'Availability'}: <span className={product.stock > 0 ? "in_stock" : "out_stock"}>{getStockStatusText()}</span>
             </p>
-            <p className="brand_item">Brand: <span>{product.brand || "Generic"}</span></p>
+            <p className="brand_item">{t ? t('brandLabel') : 'Brand'}: <span>{product.brand || (t ? t('genericBrand') : "Generic")}</span></p>
             <p className="description_item">{product.description}</p>
-            <p className="stock_item">Stock: <span>{product.stock} items left</span></p>
+            <p className="stock_item">{t ? t('stockLabel') : 'Stock'}: <span>{product.stock} {t ? t('itemsLeft') : 'items left'}</span></p>
 
             <div className="actions_row">
               <button className="add_to_cart btn btn-primary" onClick={() => addToCart(product)}>
-                <FaCartPlus /> Add to Cart
+                <FaCartPlus /> {t ? t('addToCart') : 'Add to Cart'}
               </button>
 
               <button
                 className={`compare_btn ${isCompared ? "compared" : ""}`}
                 onClick={() => addToCompare && addToCompare(product)}
-                title="Compare Product"
+                title={t ? t('compareProduct') : "Compare Product"}
               >
-                <FaBalanceScale /> {isCompared ? "Compared" : "Compare"}
+                <FaBalanceScale /> {isCompared ? (t ? t('compared') : "Compared") : (t ? t('compare') : "Compare")}
               </button>
             </div>
 
@@ -180,18 +211,18 @@ function ProductDetails() {
               <span
                 onClick={() => addToWishlist(product)}
                 style={{ color: (product && wishlistItems.some(item => item.id === product.id)) ? "#ff6b6b" : "inherit", cursor: "pointer" }}
-                title="Wishlist"
+                title={t ? t('wishlist') : "Wishlist"}
               >
                 {(product && wishlistItems.some(item => item.id === product.id)) ? <FaHeart /> : <CiHeart />}
               </span>
 
-              <span style={{ position: 'relative', cursor: 'pointer' }} title="Share">
+              <span style={{ position: 'relative', cursor: 'pointer' }} title={t ? t('share') : "Share"}>
                 <FaShare onClick={(e) => { e.preventDefault(); setShowShare(!showShare); }} />
                 {showShare && (
                   <div className="share_menu">
                     <FaWhatsapp size={22} color="#25D366" onClick={(e) => { e.preventDefault(); window.open(`https://wa.me/?text=Check this out: ${window.location.origin}/products/${product.id}`) }} />
                     <FaFacebook size={22} color="#1877F2" onClick={(e) => { e.preventDefault(); window.open(`https://www.facebook.com/sharer/sharer.php?u=${window.location.origin}/products/${product.id}`) }} />
-                    <FaLink size={22} color="#333" onClick={(e) => { e.preventDefault(); navigator.clipboard.writeText(`${window.location.origin}/products/${product.id}`); showToast ? showToast("Link copied to clipboard!", "info") : alert('Link copied!'); }} />
+                    <FaLink size={22} color="#333" onClick={(e) => { e.preventDefault(); navigator.clipboard.writeText(`${window.location.origin}/products/${product.id}`); showToast ? showToast(t ? t('linkCopied') : "Link copied!", "info") : alert('Link copied!'); }} />
                   </div>
                 )}
               </span>
@@ -205,14 +236,14 @@ function ProductDetails() {
         <div className="container">
           <div className="reviews_header">
             <div className="reviews_header_title">
-              <h2>Customer Reviews</h2>
-              <span className="reviews_count_badge">{reviews.length} reviews</span>
+              <h2>{t ? t('customerReviews') : 'Customer Reviews'}</h2>
+              <span className="reviews_count_badge">{reviews.length} {t ? t('reviewsCountLabel') : 'reviews'}</span>
             </div>
             <div className="overall_rating">
               <span className="big_rating">{product.rating?.toFixed(1) || 4.5}</span>
               <div>
                 <div className="starts">{renderStars(product.rating || 4.5)}</div>
-                <p>Based on customer experiences</p>
+                <p>{t ? t('basedOnReviews') : 'Based on customer experiences'}</p>
               </div>
             </div>
           </div>
@@ -220,33 +251,33 @@ function ProductDetails() {
           <div className="reviews_grid">
             {/* Review Form */}
             <form className="add_review_form" onSubmit={handleAddReview}>
-              <h3>Write a Review</h3>
+              <h3>{t ? t('writeReview') : 'Write a Review'}</h3>
               <div className="form_group">
-                <label>Your Name</label>
+                <label>{t ? t('yourName') : 'Your Name'}</label>
                 <input
                   type="text"
-                  placeholder={user?.name || "Enter your name"}
+                  placeholder={user?.name || (t ? t('enterYourName') : "Enter your name")}
                   value={reviewerName}
                   onChange={(e) => setReviewerName(e.target.value)}
                 />
               </div>
 
               <div className="form_group">
-                <label>Rating</label>
+                <label>{t ? t('ratingLabel') : 'Rating'}</label>
                 <select value={newRating} onChange={(e) => setNewRating(e.target.value)}>
-                  <option value="5">⭐⭐⭐⭐⭐ (5/5 - Excellent)</option>
-                  <option value="4">⭐⭐⭐⭐ (4/5 - Very Good)</option>
-                  <option value="3">⭐⭐⭐ (3/5 - Average)</option>
-                  <option value="2">⭐⭐ (2/5 - Poor)</option>
-                  <option value="1">⭐ (1/5 - Terrible)</option>
+                  <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+                  <option value="4">⭐⭐⭐⭐ (4/5)</option>
+                  <option value="3">⭐⭐⭐ (3/5)</option>
+                  <option value="2">⭐⭐ (2/5)</option>
+                  <option value="1">⭐ (1/5)</option>
                 </select>
               </div>
 
               <div className="form_group">
-                <label>Your Review</label>
+                <label>{t ? t('yourReview') : 'Your Review'}</label>
                 <textarea
                   rows="4"
-                  placeholder="Share your thoughts about this product..."
+                  placeholder={t ? t('reviewPlaceholder') : "Share your thoughts about this product..."}
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   required
@@ -254,7 +285,7 @@ function ProductDetails() {
               </div>
 
               <button type="submit" className="btn btn-primary submit_review_btn">
-                <FaPaperPlane /> Submit Review
+                <FaPaperPlane /> {t ? t('submitReview') : 'Submit Review'}
               </button>
             </form>
 
@@ -268,7 +299,7 @@ function ProductDetails() {
                       <div>
                         <h4>{rev.reviewerName}</h4>
                         <span className="review_date">
-                          {rev.date ? new Date(rev.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recently'}
+                          {rev.date ? new Date(rev.date).toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : (t ? t('recently') : 'Recently')}
                         </span>
                       </div>
                     </div>
@@ -285,7 +316,7 @@ function ProductDetails() {
       {loadingRelatedProducts ? (
         <Loading />
       ) : (
-        <SilederProduct key={product.category} data={relatedProducts} title={product.category.replace("-", " ")} />
+        <SilederProduct key={product.category} data={relatedProducts} title={product.category} />
       )}
     </div>
   );

@@ -1,13 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { FaCheckCircle, FaBox, FaHome, FaTachometerAlt } from 'react-icons/fa';
+import { LanguageContext } from '../../components/context/LanguageContext';
 import './OrderSuccess.css';
 
 function OrderSuccess() {
     const location = useLocation();
     const navigate = useNavigate();
-    const { order } = location.state || {};
+    const { t, language } = useContext(LanguageContext) || {};
     const [showConfetti, setShowConfetti] = useState(true);
+
+    const [order] = useState(() => {
+        if (location.state?.order) return location.state.order;
+        try {
+            const saved = sessionStorage.getItem('last_order');
+            if (saved) return JSON.parse(saved);
+        } catch (e) {
+            console.error(e);
+        }
+        return null;
+    });
 
     useEffect(() => {
         if (!order) { navigate('/'); return; }
@@ -52,67 +64,54 @@ function OrderSuccess() {
                         <div className="success_icon_ring"></div>
                     </div>
 
-                    <h1>Order Placed Successfully! 🎉</h1>
+                    <h1>{t ? t('orderSuccessTitle') : 'Order Placed Successfully!'}</h1>
                     <p className="success_subtitle">
-                        Thank you for shopping with Reda Store! Your order is being prepared.
+                        {t ? t('orderSuccessDesc') : 'Thank you for shopping with us. Your order is being processed.'}
                     </p>
 
                     {/* Tracking */}
                     <div className="tracking_card">
-                        <div className="tracking_label">Your Tracking Number</div>
+                        <div className="tracking_label">{t ? t('trackingNumber') : 'TRACKING NUMBER:'}</div>
                         <div className="tracking_number">{order.trackingNumber}</div>
-                        <p className="tracking_note">Save this number to track your shipment</p>
                     </div>
 
                     {/* Order Details */}
                     <div className="order_details_grid">
                         <div className="order_detail_item">
-                            <span className="detail_label">Order Date</span>
+                            <span className="detail_label">{language === 'ar' ? 'التاريخ' : 'DATE'}</span>
                             <span className="detail_value">
-                                {new Date(order.date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                {new Date(order.date).toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                             </span>
                         </div>
                         <div className="order_detail_item">
-                            <span className="detail_label">Total Amount</span>
+                            <span className="detail_label">{language === 'ar' ? 'الإجمالي' : 'TOTAL'}</span>
                             <span className="detail_value total_amount">${order.total?.toFixed(2)}</span>
                         </div>
                         <div className="order_detail_item">
-                            <span className="detail_label">Payment Method</span>
-                            <span className="detail_value">{order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Credit Card'}</span>
+                            <span className="detail_label">{language === 'ar' ? 'طريقة الدفع' : 'PAYMENT METHOD'}</span>
+                            <span className="detail_value">
+                                {order.paymentMethod === 'cod' 
+                                    ? (t ? t('cashOnDelivery') : 'Cash on Delivery') 
+                                    : (t ? t('cardPayment') : 'Credit / Debit Card')}
+                            </span>
                         </div>
                         <div className="order_detail_item">
-                            <span className="detail_label">Status</span>
-                            <span className="detail_value status_badge">{order.status}</span>
+                            <span className="detail_label">{language === 'ar' ? 'الحالة' : 'STATUS'}</span>
+                            <span className="detail_value status_badge">{order.status || 'Processing'}</span>
                         </div>
                         <div className="order_detail_item full_width">
-                            <span className="detail_label">Delivery Address</span>
+                            <span className="detail_label">{language === 'ar' ? 'العنوان' : 'STREET ADDRESS *'}</span>
                             <span className="detail_value">{order.shippingAddress}</span>
                         </div>
                     </div>
 
-                    {/* Order Items Preview */}
-                    {order.items?.length > 0 && (
-                        <div className="success_items">
-                            <h3><FaBox /> Your Items ({order.items.length})</h3>
-                            <div className="success_items_grid">
-                                {order.items.map((item, i) => (
-                                    <div key={i} className="success_item">
-                                        <img src={item.images?.[0]} alt={item.title} />
-                                        <p>{item.title}</p>
-                                        <span>x{item.quantity || 1}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
                     {/* Actions */}
                     <div className="success_actions">
                         <Link to="/" className="success_btn primary">
-                            <FaHome /> Continue Shopping
+                            <FaHome /> {t ? t('backToHome') : 'Back to Home'}
                         </Link>
                         <Link to="/dashboard" className="success_btn secondary">
-                            <FaTachometerAlt /> View My Orders
+                            <FaTachometerAlt /> {t ? t('dashboard') : 'Dashboard'}
                         </Link>
                     </div>
                 </div>

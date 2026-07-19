@@ -13,12 +13,23 @@ function Dashboard() {
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState({ name: user?.name || '', phone: user?.phone || '', address: user?.address || '' });
 
-    if (!user) {
-        navigate('/login');
-        return null;
-    }
+    const [orders, setOrders] = useState([]);
+    const [loadingOrders, setLoadingOrders] = useState(true);
 
-    const orders = getOrders();
+    React.useEffect(() => {
+        if (!user) return;
+        const fetchUserOrders = async () => {
+            try {
+                const userOrders = await getOrders();
+                setOrders(userOrders || []);
+            } catch (err) {
+                console.error("Error loading orders:", err);
+            } finally {
+                setLoadingOrders(false);
+            }
+        };
+        fetchUserOrders();
+    }, [user]);
 
     const handleSave = () => {
         updateUser(editData);

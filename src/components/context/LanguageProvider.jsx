@@ -1,6 +1,30 @@
 import { useState, useEffect } from 'react';
 import { LanguageContext } from './LanguageContext';
 
+const categoryTranslations = {
+  "smartphones": "الهواتف الذكية",
+  "mobile-accessories": "إكسسوارات المحمول",
+  "laptops": "أجهزة اللابتوب",
+  "tablets": "أجهزة الأيباد والتابلت",
+  "mens-shirts": "قمصان رجالي",
+  "mens-shoes": "أحذية رجالي",
+  "mens-watches": "ساعات رجالي",
+  "womens-dresses": "فساتين حريمي",
+  "womens-shoes": "أحذية حريمي",
+  "womens-watches": "ساعات حريمي",
+  "womens-bags": "حقائب حريمي",
+  "sunglasses": "نظارات شمسية",
+  "automotive": "مستلزمات سيارات",
+  "motorcycle": "مستلزمات دراجات نارية",
+  "lighting": "إضاءة وديكور",
+  "home-decoration": "ديكورات منزلية",
+  "groceries": "منتجات البقالة",
+  "skin-care": "العناية بالبشرة",
+  "beauty": "منتجات التجميل",
+  "furniture": "أثاث منزلي",
+  "tops": "ملابس علوية"
+};
+
 const translations = {
   en: {
     home: "Home",
@@ -35,10 +59,142 @@ const translations = {
     terms: "Terms & Conditions",
     faq: "FAQ",
     returns: "Return Policy",
-    address: "Address",
+    address: "Address:",
     cairo: "Cairo, Egypt",
     emailText: "Email:",
-    phoneText: "Call us:"
+    phoneText: "Call us:",
+    
+    // Hero Slider
+    heroSub1: "Introducing the new",
+    heroTitle1: "Microsoft Xbox 360 Controller",
+    heroDesc1: "Windows 11 Compatible",
+    shopNow: "Shop Now",
+
+    // Product Card & Actions
+    inCart: "in cart",
+    addToCart: "Add to Cart",
+    compareProduct: "Compare Product",
+    share: "Share",
+    linkCopied: "Link copied to clipboard!",
+    compared: "Compared",
+
+    // Compare Bar & Page
+    compareProducts: "Compare Products",
+    clear: "Clear",
+    compareNow: "Compare Now",
+    noCompareProducts: "No products selected for comparison",
+    compareDesc: "Select up to 4 products from the store to compare their features, prices, and specs side by side.",
+    browseProducts: "Browse Products",
+    productComparison: "Product Comparison",
+    comparingCount: "Comparing",
+    productsCount: "product(s)",
+    clearAll: "Clear All",
+    feature: "Feature",
+    rating: "Rating",
+    brand: "Brand",
+    category: "Category",
+    availability: "Availability",
+    discount: "Discount",
+    description: "Description",
+    actions: "Actions",
+    noDiscount: "No discount",
+    inStock: "In Stock",
+    outOfStock: "Out of Stock",
+    genericBrand: "Generic",
+
+    // Product Details
+    productNotFound: "Product not found",
+    off: "OFF",
+    brandLabel: "Brand",
+    availabilityLabel: "Availability",
+    stockLabel: "Stock",
+    itemsLeft: "items left",
+    customerReviews: "Customer Reviews",
+    basedOnReviews: "Based on customer experiences",
+    writeReview: "Write a Review",
+    yourName: "Your Name",
+    enterYourName: "Enter your name",
+    ratingLabel: "Rating",
+    yourReview: "Your Review",
+    reviewPlaceholder: "Share your thoughts about this product...",
+    submitReview: "Submit Review",
+    reviewSubmitted: "Thank you! Your review has been added.",
+    writeCommentPrompt: "Please write a comment for your review",
+    recently: "Recently",
+    relatedProducts: "Related Products",
+    reviewsCountLabel: "reviews",
+
+    // Product Filters & Sort
+    filtersAndSorting: "Filters & Sorting",
+    reset: "Reset",
+    sortBy: "Sort By",
+    sortDefault: "Featured / Default",
+    sortPriceAsc: "Price: Low to High",
+    sortPriceDesc: "Price: High to Low",
+    sortRatingDesc: "Rating: High to Low",
+    sortTitleAsc: "Title: A to Z",
+    priceLimit: "Price Limit",
+    minRating: "Minimum Rating",
+    all: "All",
+    allBrands: "All Brands",
+
+    // Cart Page
+    orderSummary: "Order Summary",
+    yourCartIsEmpty: "Your Cart is Empty",
+    subtotal: "Subtotal",
+    total: "Total",
+    proceedToCheckout: "Proceed to Checkout",
+    promoCode: "Promo Code",
+    enterPromoCode: "Enter promo code...",
+    apply: "Apply",
+    remove: "Remove",
+    promoApplied: "applied!",
+    invalidPromo: "Invalid promo code. Try F1, SAVE10, SAVE20, or FLAT50",
+    qty: "Qty",
+
+    // Wishlist Page
+    favoritesPage: "Favorites Page",
+    yourWishlistIsEmpty: "Your Wishlist is Empty",
+
+    // Checkout & Order Success
+    checkout: "Checkout",
+    shippingInfo: "Shipping Information",
+    fullName: "Full Name *",
+    email: "Email *",
+    phone: "Phone *",
+    city: "City *",
+    streetAddress: "Street Address *",
+    paymentMethod: "Payment Method",
+    cashOnDelivery: "Cash on Delivery",
+    codDesc: "Pay when your order arrives",
+    cardPayment: "Credit / Debit Card",
+    cardDesc: "Visa, Mastercard accepted",
+    cardNumber: "Card Number",
+    expiryDate: "Expiry Date",
+    cvv: "CVV",
+    placeOrder: "Place Order",
+    processingOrder: "Processing Order...",
+    fillRequired: "Please fill in all required fields.",
+    orderSuccessTitle: "Order Placed Successfully!",
+    orderSuccessDesc: "Thank you for shopping with us. Your order is being processed.",
+    trackingNumber: "Tracking Number:",
+    backToHome: "Back to Home",
+
+    // Auth & Dashboard & Others
+    loginTitle: "Log In to Your Account",
+    signUpTitle: "Create a New Account",
+    nameLabel: "Name",
+    passwordLabel: "Password",
+    dontHaveAccount: "Don't have an account?",
+    alreadyHaveAccount: "Already have an account?",
+    contactUs: "Contact Us",
+    sendMessage: "Send Message",
+    yourMessage: "Your Message",
+    subject: "Subject",
+    aboutUsTitle: "About MAHMOUD STORE",
+    aboutUsDesc: "We provide high-quality products with fast shipping and excellent customer service.",
+    noProductsFound: "No products found",
+    searchResultsFor: "Search results for"
   },
   ar: {
     home: "الرئيسية",
@@ -76,7 +232,139 @@ const translations = {
     address: "العنوان:",
     cairo: "القاهرة، مصر",
     emailText: "البريد الإلكتروني:",
-    phoneText: "اتصل بنا:"
+    phoneText: "اتصل بنا:",
+
+    // Hero Slider
+    heroSub1: "نقدم لكم أحدث",
+    heroTitle1: "ذراع تحكم مايكروسوفت إكس بوكس 360",
+    heroDesc1: "متوافق مع ويندوز 11",
+    shopNow: "تسوق الآن",
+
+    // Product Card & Actions
+    inCart: "في السلة",
+    addToCart: "أضف إلى السلة",
+    compareProduct: "مقارنة المنتج",
+    share: "مشاركة",
+    linkCopied: "تم نسخ الرابط الحافظة!",
+    compared: "تمت المقارنة",
+
+    // Compare Bar & Page
+    compareProducts: "مقارنة المنتجات",
+    clear: "مسح",
+    compareNow: "قارن الآن",
+    noCompareProducts: "لم يتم اختيار منتجات للمقارنة",
+    compareDesc: "اختر حتى 4 منتجات من المتجر لمقارنة مميزاتها وأسعارها ومواصفاتها جنباً إلى جنب.",
+    browseProducts: "تصفح المنتجات",
+    productComparison: "مقارنة المنتجات",
+    comparingCount: "مقارنة",
+    productsCount: "منتج(منتجات)",
+    clearAll: "مسح الكل",
+    feature: "الخاصية",
+    rating: "التقييم",
+    brand: "العلامة التجارية",
+    category: "القسم",
+    availability: "التوفر",
+    discount: "الخصم",
+    description: "الوصف",
+    actions: "الإجراءات",
+    noDiscount: "بدون خصم",
+    inStock: "متوفر بالمخزن",
+    outOfStock: "غير متوفر",
+    genericBrand: "عام",
+
+    // Product Details
+    productNotFound: "المنتج غير موجود",
+    off: "خصم",
+    brandLabel: "العلامة التجارية",
+    availabilityLabel: "حالة التوفر",
+    stockLabel: "المخزون المتوفر",
+    itemsLeft: "قطعة متبقية",
+    customerReviews: "آراء وتقييمات العملاء",
+    basedOnReviews: "بناءً على تجارب العملاء الفعليين",
+    writeReview: "أضف تقييمك للمنتج",
+    yourName: "الاسم بالكامل",
+    enterYourName: "أدخل اسمك",
+    ratingLabel: "درجة التقييم",
+    yourReview: "تعليقك وتقييمك",
+    reviewPlaceholder: "اكتب تجربتك وملاحظاتك حول هذا المنتج...",
+    submitReview: "إرسال التقييم",
+    reviewSubmitted: "شكراً لك! تم إضافة تقييمك بنجاح.",
+    writeCommentPrompt: "يرجى كتابة تعليق لتقييمك",
+    recently: "مؤخراً",
+    relatedProducts: "منتجات ذات صلة",
+    reviewsCountLabel: "تقييمات",
+
+    // Product Filters & Sort
+    filtersAndSorting: "الفلاتر والترتيب",
+    reset: "إعادة ضبط",
+    sortBy: "ترتيب حسب",
+    sortDefault: "المميزة / الافتراضي",
+    sortPriceAsc: "السعر: من الأقل للأعلى",
+    sortPriceDesc: "السعر: من الأعلى للأقل",
+    sortRatingDesc: "التقييم: الأعلى أولاً",
+    sortTitleAsc: "الاسم: من أ إلى ي",
+    priceLimit: "حد السعر الأقصى",
+    minRating: "الحد الأدنى للتقييم",
+    all: "الكل",
+    allBrands: "جميع الماركات",
+
+    // Cart Page
+    orderSummary: "ملخص الطلب",
+    yourCartIsEmpty: "سلة التسوق فارغة حالياً",
+    subtotal: "المجموع الفرعي",
+    total: "الإجمالي الكلي",
+    proceedToCheckout: "متابعة الشراء والتأكيد",
+    promoCode: "كود الخصم",
+    enterPromoCode: "أدخل كود الخصم...",
+    apply: "تطبيق الخصم",
+    remove: "إزالة",
+    promoApplied: "تم تطبيق الخصم!",
+    invalidPromo: "كود الخصم غير صحيح. جرب F1 أو SAVE10 أو SAVE20 أو FLAT50",
+    qty: "الكمية",
+
+    // Wishlist Page
+    favoritesPage: "قائمة المنتجات المفضلة",
+    yourWishlistIsEmpty: "قائمة المفضلة فارغة حالياً",
+
+    // Checkout & Order Success
+    checkout: "إتمام الشراء",
+    shippingInfo: "بيانات الشحن والتوصيل",
+    fullName: "الاسم بالكامل *",
+    email: "البريد الإلكتروني *",
+    phone: "رقم الهاتف *",
+    city: "المدينة *",
+    streetAddress: "العنوان بالتفصيل *",
+    paymentMethod: "طريقة الدفع",
+    cashOnDelivery: "الدفع عند الاستلام",
+    codDesc: "الدفع نقداً فور وصول الطلب",
+    cardPayment: "بطاقة ائتمان / ميزة",
+    cardDesc: "مقبول Visa و Mastercard",
+    cardNumber: "رقم البطاقة",
+    expiryDate: "تاريخ الانتهاء",
+    cvv: "الرمز السري CVV",
+    placeOrder: "تأكيد وإرسال الطلب",
+    processingOrder: "جاري جاري معالجة الطلب...",
+    fillRequired: "يرجى ملء جميع الحقول المطلوبة.",
+    orderSuccessTitle: "تم إرسال طلبك بنجاح!",
+    orderSuccessDesc: "شكراً لتسوقك معنا. جاري تجهيز الطلب وشحنه إليك.",
+    trackingNumber: "رقم تتبع الطلب:",
+    backToHome: "العودة للرئيسية",
+
+    // Auth & Dashboard & Others
+    loginTitle: "تسجيل الدخول إلى حسابك",
+    signUpTitle: "إنشاء حساب جديد",
+    nameLabel: "الاسم",
+    passwordLabel: "كلمة المرور",
+    dontHaveAccount: "ليس لديك حساب؟",
+    alreadyHaveAccount: "لديك حساب بالفعل؟",
+    contactUs: "تواصل معنا",
+    sendMessage: "إرسال الرسالة",
+    yourMessage: "رسالتك",
+    subject: "الموضوع",
+    aboutUsTitle: "عن متجر محمود ستور",
+    aboutUsDesc: "نحن نقدم أفضل المنتجات عالية الجودة مع خدمة شحن سريعة وسريعة ودعم فني متميز.",
+    noProductsFound: "لم يتم العثور على منتجات",
+    searchResultsFor: "نتائج البحث عن"
   }
 };
 
@@ -103,8 +391,17 @@ export default function LanguageProvider({ children }) {
     return translations[language]?.[key] || translations['en']?.[key] || key;
   };
 
+  const tCategory = (cat) => {
+    if (!cat) return '';
+    if (language === 'ar') {
+      const cleanCat = cat.toLowerCase().trim();
+      return categoryTranslations[cleanCat] || cat.replace('-', ' ');
+    }
+    return cat.replace('-', ' ');
+  };
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, toggleLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, toggleLanguage, t, tCategory }}>
       {children}
     </LanguageContext.Provider>
   );

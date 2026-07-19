@@ -1,18 +1,21 @@
-import React from "react";
+import React, { useContext } from "react";
 import Product from "./Product";
 import "./slideproduct.css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import { Pagination, Autoplay } from "swiper/modules";
+import { LanguageContext } from "../context/LanguageContext";
 
 export default function SilederProduct({ data, title }) {
+  const { tCategory } = useContext(LanguageContext) || {};
+  const displayTitle = tCategory ? tCategory(title) : title;
+
   return (
     <div className="slider_products slide">
       <div className="container">
         <div className="top_slide">
-          <h2>{title}</h2>
-          <p>mahmoud sameh</p>
+          <h2>{displayTitle}</h2>
         </div>
         <Swiper
           loop={true}

@@ -1,14 +1,16 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 import Product from '../../components/sliderProducts/Product';
 import Loading from '../../components/loading/Loading';
 import ProductFilters from '../../components/filters/ProductFilters';
+import { LanguageContext } from '../../components/context/LanguageContext';
 import './Search.css';
 
 function Search() {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const query = queryParams.get('q') || '';
+    const { t } = useContext(LanguageContext) || {};
 
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(!!query);
@@ -78,11 +80,11 @@ function Search() {
             <div className="container">
                 <div className="search_header_wrap">
                     <h1 className='search_title'>
-                        {query ? `Search Results for: "${query}"` : "Search Products"}
+                        {query ? `${t ? t('searchResultsFor') : 'Search results for'}: "${query}"` : (t ? t('searchPlaceholder') : "Search Products")}
                     </h1>
                     {query && (
                         <span className="products_count_badge">
-                            Found {filteredProducts.length} product(s)
+                            {filteredProducts.length} / {products.length}
                         </span>
                     )}
                 </div>
@@ -108,8 +110,8 @@ function Search() {
                         <main className="search_main_content">
                             {filteredProducts.length === 0 ? (
                                 <div className="no_results_card">
-                                    <h3>No products match your filters</h3>
-                                    <button className="btn btn-primary" onClick={handleReset}>Clear Filters</button>
+                                    <h3>{t ? t('noProductsFound') : 'No products match your filters'}</h3>
+                                    <button className="btn btn-primary" onClick={handleReset}>{t ? t('reset') : 'Clear Filters'}</button>
                                 </div>
                             ) : (
                                 <div className='search_grid'>
@@ -122,8 +124,7 @@ function Search() {
                     </div>
                 ) : (
                     <div className="no_results_card">
-                        <h3>No products found</h3>
-                        <p>Try searching for keywords like "phone", "laptop", "shirt", or "watch".</p>
+                        <h3>{t ? t('noProductsFound') : 'No products found'}</h3>
                     </div>
                 )}
             </div>

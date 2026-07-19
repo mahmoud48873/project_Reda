@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { FaFilter, FaRedo, FaSortAmountDown } from 'react-icons/fa';
+import { LanguageContext } from '../context/LanguageContext';
 import './ProductFilters.css';
 
 export default function ProductFilters({
@@ -15,6 +16,8 @@ export default function ProductFilters({
   setSelectedBrand,
   onReset
 }) {
+  const { t } = useContext(LanguageContext) || {};
+
   // Extract unique brands from current products
   const brands = Array.from(
     new Set(products.map(p => p.brand).filter(Boolean))
@@ -23,28 +26,28 @@ export default function ProductFilters({
   return (
     <div className="product_filters_card">
       <div className="filters_header">
-        <h3><FaFilter /> Filters & Sorting</h3>
+        <h3><FaFilter /> {t ? t('filtersAndSorting') : 'Filters & Sorting'}</h3>
         <button className="reset_filters_btn" onClick={onReset} title="Reset all filters">
-          <FaRedo /> Reset
+          <FaRedo /> {t ? t('reset') : 'Reset'}
         </button>
       </div>
 
       {/* Sort By */}
       <div className="filter_group">
-        <label><FaSortAmountDown /> Sort By</label>
+        <label><FaSortAmountDown /> {t ? t('sortBy') : 'Sort By'}</label>
         <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-          <option value="default">Featured / Default</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-          <option value="rating-desc">Rating: High to Low</option>
-          <option value="title-asc">Title: A to Z</option>
+          <option value="default">{t ? t('sortDefault') : 'Featured / Default'}</option>
+          <option value="price-asc">{t ? t('sortPriceAsc') : 'Price: Low to High'}</option>
+          <option value="price-desc">{t ? t('sortPriceDesc') : 'Price: High to Low'}</option>
+          <option value="rating-desc">{t ? t('sortRatingDesc') : 'Rating: High to Low'}</option>
+          <option value="title-asc">{t ? t('sortTitleAsc') : 'Title: A to Z'}</option>
         </select>
       </div>
 
       {/* Price Range */}
       <div className="filter_group">
         <div className="filter_label_row">
-          <label>Price Limit</label>
+          <label>{t ? t('priceLimit') : 'Price Limit'}</label>
           <span className="price_val">${priceRange[1]}</span>
         </div>
         <input
@@ -64,7 +67,7 @@ export default function ProductFilters({
 
       {/* Minimum Rating */}
       <div className="filter_group">
-        <label>Minimum Rating</label>
+        <label>{t ? t('minRating') : 'Minimum Rating'}</label>
         <div className="rating_filter_options">
           {[0, 3, 4, 4.5].map((stars) => (
             <button
@@ -72,7 +75,7 @@ export default function ProductFilters({
               className={`rating_opt_btn ${minRating === stars ? 'active' : ''}`}
               onClick={() => setMinRating(stars)}
             >
-              {stars === 0 ? 'All' : `${stars}+ ⭐`}
+              {stars === 0 ? (t ? t('all') : 'All') : `${stars}+ ⭐`}
             </button>
           ))}
         </div>
@@ -81,9 +84,9 @@ export default function ProductFilters({
       {/* Brand Filter */}
       {brands.length > 0 && (
         <div className="filter_group">
-          <label>Brand</label>
+          <label>{t ? t('brand') : 'Brand'}</label>
           <select value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)}>
-            <option value="">All Brands ({brands.length})</option>
+            <option value="">{t ? t('allBrands') : 'All Brands'} ({brands.length})</option>
             {brands.map(b => (
               <option key={b} value={b}>{b}</option>
             ))}

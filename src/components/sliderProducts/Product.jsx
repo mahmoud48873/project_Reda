@@ -8,6 +8,7 @@ import { CartContext } from "../context/CartContext";
 import { WishlistContext } from "../context/WishlistContext";
 import { CompareContext } from "../context/CompareContext";
 import { ToastContext } from "../context/ToastContext";
+import { LanguageContext } from "../context/LanguageContext";
 
 function renderStars(rating = 5) {
   const stars = [];
@@ -31,6 +32,7 @@ export default function Product({ item }) {
   const { wishlistItems, addToWishlist } = useContext(WishlistContext);
   const { addToCompare, isInCompare } = useContext(CompareContext) || {};
   const { showToast } = useContext(ToastContext) || {};
+  const { t } = useContext(LanguageContext) || {};
   const [showShare, setShowShare] = useState(false);
 
   const isAdded = CartItem.some((cartItem) => cartItem.id === item.id);
@@ -40,7 +42,7 @@ export default function Product({ item }) {
   return (
     <div className={`poduct ${isAdded ? "added" : ""}`}>
       <Link to={`/products/${item.id}`}>
-        {isAdded && <span className="stat_cart"><FaCheck /> in cart</span>}
+        {isAdded && <span className="stat_cart"><FaCheck /> {t ? t('inCart') : 'in cart'}</span>}
         <div className="img_product">
           <img src={item.images?.[0] || item.thumbnail} alt={item.title} />
         </div>
@@ -57,7 +59,7 @@ export default function Product({ item }) {
         <span
           className="add"
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCart(item); }}
-          title="Add to Cart"
+          title={t ? t('addToCart') : "Add to Cart"}
         >
           <FaCartPlus />
         </span>
@@ -65,7 +67,7 @@ export default function Product({ item }) {
         <span
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToWishlist(item); }}
           style={{ color: isWishlisted ? "#ff6b6b" : "inherit" }}
-          title="Wishlist"
+          title={t ? t('wishlist') : "Wishlist"}
         >
           {isWishlisted ? <FaHeart /> : <CiHeart />}
         </span>
@@ -73,12 +75,12 @@ export default function Product({ item }) {
         <span
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); addToCompare && addToCompare(item); }}
           style={{ color: isCompared ? "#6366f1" : "inherit" }}
-          title="Compare Product"
+          title={t ? t('compareProduct') : "Compare Product"}
         >
           <FaBalanceScale />
         </span>
 
-        <span style={{ position: 'relative' }} title="Share">
+        <span style={{ position: 'relative' }} title={t ? t('share') : "Share"}>
           <FaShare onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowShare(!showShare); }} />
           {showShare && (
             <div className="share_menu" style={{
@@ -87,7 +89,7 @@ export default function Product({ item }) {
             }}>
               <FaWhatsapp size={22} color="#25D366" onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(`https://wa.me/?text=Check this out: ${window.location.origin}/products/${item.id}`) }} />
               <FaFacebook size={22} color="#1877F2" onClick={(e) => { e.preventDefault(); e.stopPropagation(); window.open(`https://www.facebook.com/sharer/sharer.php?u=${window.location.origin}/products/${item.id}`) }} />
-              <FaLink size={22} color="#333" onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigator.clipboard.writeText(`${window.location.origin}/products/${item.id}`); showToast ? showToast("Link copied!", "info") : alert('Link copied!'); }} />
+              <FaLink size={22} color="#333" onClick={(e) => { e.preventDefault(); e.stopPropagation(); navigator.clipboard.writeText(`${window.location.origin}/products/${item.id}`); showToast ? showToast(t ? t('linkCopied') : "Link copied!", "info") : alert('Link copied!'); }} />
             </div>
           )}
         </span>

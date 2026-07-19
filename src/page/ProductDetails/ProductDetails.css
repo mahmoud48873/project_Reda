@@ -32,6 +32,7 @@
 .item_details .container .img_item .bag_img img {
   max-height: 380px;
   object-fit: contain;
+  transition: opacity 0.25s ease-in-out;
 }
 
 .item_details .container .img_item .sma_img {

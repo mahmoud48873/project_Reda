@@ -15,9 +15,15 @@ function SignUp() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const { signup, getUser } = useContext(UserContext);
+    const { user, signup } = useContext(UserContext);
     const { showToast } = useContext(ToastContext);
     const navigate = useNavigate();
+
+    React.useEffect(() => {
+        if (user) {
+            navigate('/', { replace: true });
+        }
+    }, [user, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -39,19 +45,24 @@ function SignUp() {
         }
 
         setIsLoading(true);
-        await new Promise(res => setTimeout(res, 800));
 
-        const existingUser = getUser(email);
-        if (existingUser) {
-            setError("An account with this email already exists. Please log in.");
+        try {
+            await signup({ name, email, password });
+            showToast(`Welcome to Reda Store, ${name}! 🎉`, 'success');
             setIsLoading(false);
-            return;
+            navigate('/', { replace: true });
+        } catch (err) {
+            setIsLoading(false);
+            if (err.code === 'auth/email-already-in-use') {
+                setError("An account with this email already exists. Please log in.");
+            } else if (err.code === 'auth/invalid-email') {
+                setError("Please enter a valid email address.");
+            } else if (err.code === 'auth/weak-password') {
+                setError("Password is too weak. Please use at least 6 characters.");
+            } else {
+                setError(err.message || "Failed to create account. Please try again.");
+            }
         }
-
-        signup({ name, email, password });
-        showToast(`Welcome to Reda Store, ${name}! 🎉`, 'success');
-        setIsLoading(false);
-        navigate('/');
     };
 
     return (
