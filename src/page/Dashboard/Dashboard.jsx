@@ -1,13 +1,15 @@
 import React, { useContext, useState } from 'react';
 import { UserContext } from '../../components/context/UserContext';
 import { ToastContext } from '../../components/context/ToastContext';
+import { LanguageContext } from '../../components/context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaBox, FaHeart, FaEdit, FaSave, FaTimes, FaShoppingBag, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
 import './Dashboard.css';
 
 function Dashboard() {
-    const { user, logout, getOrders, updateUser } = useContext(UserContext);
+    const { user, logout, getOrders, cancelOrder, updateUser } = useContext(UserContext);
     const { showToast } = useContext(ToastContext);
+    const { language } = useContext(LanguageContext) || {};
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('profile');
     const [isEditing, setIsEditing] = useState(false);
@@ -15,6 +17,27 @@ function Dashboard() {
 
     const [orders, setOrders] = useState([]);
     const [loadingOrders, setLoadingOrders] = useState(true);
+
+    const [cancelModalData, setCancelModalData] = useState({ isOpen: false, order: null });
+
+    const handleCancelOrderClick = (order) => {
+        setCancelModalData({ isOpen: true, order });
+    };
+
+    const confirmCancelOrder = async () => {
+        const orderToCancel = cancelModalData.order;
+        if (!orderToCancel) return;
+        
+        setCancelModalData({ isOpen: false, order: null });
+        try {
+            await cancelOrder(orderToCancel);
+            setOrders(prev => prev.map(o => o.trackingNumber === orderToCancel.trackingNumber ? { ...o, status: 'Cancelled' } : o));
+            showToast?.(language === 'ar' ? "تم إلغاء الطلب بنجاح 📦" : "Order cancelled successfully 📦", "info");
+        } catch (err) {
+            console.error("Cancel order error:", err);
+            showToast?.(language === 'ar' ? "حدث خطأ أثناء إلغاء الطلب" : "Error cancelling order", "error");
+        }
+    };
 
     React.useEffect(() => {
         if (!user) return;
@@ -66,6 +89,11 @@ function Dashboard() {
                             <FaBox /> Order History
                             {orders.length > 0 && <span className="order_badge">{orders.length}</span>}
                         </button>
+                        {(user?.email?.toLowerCase() === 'mahmod48873@gmail.com' || user?.role === 'admin') && (
+                            <button onClick={() => navigate('/admin')} style={{ background: 'linear-gradient(135deg, #0090f0, #0060c0)', color: '#fff', fontWeight: 'bold' }}>
+                                ⚡ Admin Dashboard (لوحة التحكم)
+                            </button>
+                        )}
                         <button className="logout_btn_dash" onClick={handleLogout}>
                             <FaTimes /> Logout
                         </button>
@@ -173,6 +201,15 @@ function Dashboard() {
                                             <div className="order_card_footer">
                                                 <span>{order.items?.length} item{order.items?.length !== 1 ? 's' : ''}</span>
                                                 <strong className="order_total">${order.total?.toFixed(2)}</strong>
+                                                {order.status !== 'Cancelled' && (
+                                                    <button 
+                                                        type="button"
+                                                        onClick={() => handleCancelOrderClick(order)}
+                                                        style={{ marginLeft: 'auto', padding: '6px 12px', background: '#fee2e2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
+                                                    >
+                                                        Cancel Order
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
                                     ))}
@@ -182,6 +219,29 @@ function Dashboard() {
                     )}
                 </main>
             </div>
+
+            {/* Custom Cancel Modal */}
+            {cancelModalData.isOpen && (
+                <div className="custom_modal_overlay">
+                    <div className="custom_modal">
+                        <div className="custom_modal_header">
+                            <h3>{language === 'ar' ? 'تأكيد الإلغاء' : 'Confirm Cancellation'}</h3>
+                            <button className="close_modal_btn" onClick={() => setCancelModalData({ isOpen: false, order: null })}><FaTimes /></button>
+                        </div>
+                        <div className="custom_modal_body">
+                            <p>{language === 'ar' ? 'هل أنت متأكد من إلغاء هذا الطلب؟' : 'Are you sure you want to cancel this order?'}</p>
+                        </div>
+                        <div className="custom_modal_footer">
+                            <button className="btn_modal_cancel" onClick={() => setCancelModalData({ isOpen: false, order: null })}>
+                                {language === 'ar' ? 'تراجع' : 'Cancel'}
+                            </button>
+                            <button className="btn_modal_confirm" onClick={confirmCancelOrder}>
+                                {language === 'ar' ? 'نعم، قم بالإلغاء' : 'Yes, Cancel Order'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

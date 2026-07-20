@@ -1,10 +1,23 @@
-import React, { useState, useContext } from 'react';
+/**
+ * Developer: Mahmoud Sameh Fathy Ibrahim
+ * Code / Student ID: 624018
+ * 
+ * Description: Login Component with mandatory Email Verification check using Firebase Auth.
+ */
+
+import React, { useState, useContext, useEffect } from 'react';
 import './Login.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { BiErrorCircle } from "react-icons/bi";
 import { FaEye, FaEyeSlash, FaSignInAlt } from 'react-icons/fa';
+import { 
+    signInWithEmailAndPassword, 
+    signOut 
+} from 'firebase/auth';
+import { auth } from '../../firebase';
 import { UserContext } from '../../components/context/UserContext';
 import { ToastContext } from '../../components/context/ToastContext';
+import { LanguageContext } from '../../components/context/LanguageContext';
 
 function Login() {
     const [email, setEmail] = useState('');
@@ -12,12 +25,14 @@ function Login() {
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const { user, login } = useContext(UserContext);
-    const { showToast } = useContext(ToastContext);
+
+    const { user } = useContext(UserContext) || {};
+    const { showToast } = useContext(ToastContext) || {};
+    const { t } = useContext(LanguageContext) || { t: (key) => key };
     const navigate = useNavigate();
 
-    React.useEffect(() => {
-        if (user) {
+    useEffect(() => {
+        if (user && user.emailVerified) {
             navigate('/', { replace: true });
         }
     }, [user, navigate]);
@@ -34,10 +49,26 @@ function Login() {
         setIsLoading(true);
 
         try {
-            const loggedUser = await login(email, password);
-            showToast(`Welcome back, ${loggedUser?.name || 'Customer'}! 👋`, 'success');
+            // 1. Sign in using signInWithEmailAndPassword
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const loggedUser = userCredential.user;
+
+            // 2. Check user.emailVerified status
+            if (!loggedUser.emailVerified) {
+                // If false: signOut immediately and show error requiring email verification
+                await signOut(auth);
+                setIsLoading(false);
+                setError("Your email address is not verified yet. Please check your inbox and verify your email before logging in.");
+                return;
+            }
+
+            // 3. If true: allow login and navigate to home/dashboard
+            if (showToast) {
+                showToast(`Welcome back, ${loggedUser.displayName || 'Customer'}! 👋`, 'success');
+            }
             setIsLoading(false);
             navigate('/', { replace: true });
+
         } catch (err) {
             setIsLoading(false);
             if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
@@ -59,8 +90,8 @@ function Login() {
                     <div className="login_icon_wrap">
                         <FaSignInAlt />
                     </div>
-                    <h2>Welcome Back</h2>
-                    <p className="login_subtitle">Sign in to your account to continue</p>
+                    <h2>{t('signIn') || 'Welcome Back'}</h2>
+                    <p className="login_subtitle">{t('loginTitle') || 'Sign in to your account to continue'}</p>
                 </div>
 
                 {error && (
@@ -75,7 +106,7 @@ function Login() {
 
                 <form onSubmit={handleSubmit} className='login_form'>
                     <div className="form_group">
-                        <label htmlFor="email">Email Address</label>
+                        <label htmlFor="email">{t('emailText') || 'Email Address'}</label>
                         <input
                             type="email"
                             id="email"
@@ -86,7 +117,7 @@ function Login() {
                         />
                     </div>
                     <div className="form_group">
-                        <label htmlFor="password">Password</label>
+                        <label htmlFor="password">{t('passwordLabel') || 'Password'}</label>
                         <div className="password_wrap">
                             <input
                                 type={showPassword ? "text" : "password"}
@@ -100,12 +131,17 @@ function Login() {
                                 {showPassword ? <FaEyeSlash /> : <FaEye />}
                             </button>
                         </div>
+                        <div style={{ textAlign: 'right', marginTop: '6px' }}>
+                            <Link to="/forgot-password" style={{ color: '#0090f0', fontSize: '13px', textDecoration: 'none', fontWeight: 500 }}>
+                                {t('forgotPassword')}
+                            </Link>
+                        </div>
                     </div>
                     <button type="submit" className="login_btn" disabled={isLoading}>
-                        {isLoading ? <span className="btn_spinner"></span> : 'Sign In'}
+                        {isLoading ? <span className="btn_spinner"></span> : (t('signIn') || 'Sign In')}
                     </button>
                     <p className="register_link">
-                        Don't have an account? <Link to="/signup">Sign up here</Link>
+                        {t('dontHaveAccount') || "Don't have an account?"} <Link to="/signup">{t('signUp') || 'Sign up here'}</Link>
                     </p>
                 </form>
             </div>

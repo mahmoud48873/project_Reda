@@ -1,3 +1,6 @@
+// Developer: Mahmoud Sameh Fathy Ibrahim
+// Student Code: 624018
+
 import React, { useContext, useState } from "react";
 import { FaCheck, FaBalanceScale, FaCartPlus, FaShare, FaHeart, FaWhatsapp, FaFacebook, FaLink } from "react-icons/fa";
 import { IoStar, IoStarOutline } from "react-icons/io5";
@@ -39,12 +42,15 @@ export default function Product({ item }) {
   const isWishlisted = wishlistItems.some((wishlistItem) => wishlistItem.id === item.id);
   const isCompared = isInCompare ? isInCompare(item.id) : false;
 
+  // Resolve image URL - check all possible fields (supports both DummyJSON and Firebase products)
+  const productImage = item.imageUrl || item.thumbnail || item.images?.[0] || '';
+
   return (
     <div className={`poduct ${isAdded ? "added" : ""}`}>
       <Link to={`/products/${item.id}`}>
         {isAdded && <span className="stat_cart"><FaCheck /> {t ? t('inCart') : 'in cart'}</span>}
         <div className="img_product">
-          <img src={item.images?.[0] || item.thumbnail} alt={item.title} />
+          <img src={productImage} alt={item.title} />
         </div>
         <p className="name_product">{item.title}</p>
         <div className="starts">

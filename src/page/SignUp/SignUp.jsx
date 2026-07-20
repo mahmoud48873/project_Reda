@@ -1,8 +1,23 @@
-import React, { useState, useContext } from 'react';
+/**
+ * Developer: Mahmoud Sameh Fathy Ibrahim
+ * Code / Student ID: 624018
+ * 
+ * Description: SignUp Component with mandatory Email Verification using Firebase Auth.
+ */
+
+import React, { useState, useContext, useEffect } from 'react';
 import './SignUp.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { BiErrorCircle } from "react-icons/bi";
 import { FaEye, FaEyeSlash, FaUserPlus } from 'react-icons/fa';
+import { 
+    createUserWithEmailAndPassword, 
+    sendEmailVerification, 
+    signOut, 
+    updateProfile 
+} from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from '../../firebase';
 import { UserContext } from '../../components/context/UserContext';
 import { ToastContext } from '../../components/context/ToastContext';
 
@@ -12,15 +27,17 @@ function SignUp() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
+    const [successMsg, setSuccessMsg] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const { user, signup } = useContext(UserContext);
-    const { showToast } = useContext(ToastContext);
+
+    const { user } = useContext(UserContext) || {};
+    const { showToast } = useContext(ToastContext) || {};
     const navigate = useNavigate();
 
-    React.useEffect(() => {
-        if (user) {
+    useEffect(() => {
+        if (user && user.emailVerified) {
             navigate('/', { replace: true });
         }
     }, [user, navigate]);
@@ -28,6 +45,7 @@ function SignUp() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setSuccessMsg('');
 
         if (name.trim().length < 2) {
             setError("Please enter your full name (at least 2 characters).");
@@ -47,10 +65,45 @@ function SignUp() {
         setIsLoading(true);
 
         try {
-            await signup({ name, email, password });
-            showToast(`Welcome to Reda Store, ${name}! 🎉`, 'success');
+            // 1. Create account with Firebase Auth
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const createdUser = userCredential.user;
+
+            // Update user profile display name
+            await updateProfile(createdUser, { displayName: name });
+
+            // Save user profile to Firestore
+            try {
+                await setDoc(doc(db, 'users', createdUser.uid), {
+                    uid: createdUser.uid,
+                    name: name,
+                    email: email,
+                    role: 'user',
+                    createdAt: new Date().toISOString()
+                });
+            } catch (firestoreErr) {
+                console.warn("Firestore save error:", firestoreErr);
+            }
+
+            // 2. Call sendEmailVerification(user)
+            await sendEmailVerification(createdUser);
+
+            // 3. Call signOut(auth) immediately
+            await signOut(auth);
+
+            // 4. Show success toast/alert asking user to verify email
+            const msg = "Account created! Please check your email inbox to verify your account before logging in.";
+            setSuccessMsg(msg);
+            if (showToast) {
+                showToast("Verification email sent! Please check your inbox 📧", 'success');
+            }
             setIsLoading(false);
-            navigate('/', { replace: true });
+
+            // 5. Redirect user to Login page
+            setTimeout(() => {
+                navigate('/login');
+            }, 3000);
+
         } catch (err) {
             setIsLoading(false);
             if (err.code === 'auth/email-already-in-use') {
@@ -82,6 +135,16 @@ function SignUp() {
                         <div className="error_content">
                             <h4>Sign Up Error</h4>
                             <p>{error}</p>
+                        </div>
+                    </div>
+                )}
+
+                {successMsg && (
+                    <div className="beautiful_error_box" style={{ background: '#e6fffa', borderLeftColor: '#38b2ac' }}>
+                        <BiErrorCircle className="error_icon" style={{ color: '#38b2ac' }} />
+                        <div className="error_content">
+                            <h4 style={{ color: '#2c7a7b' }}>Verify Email</h4>
+                            <p style={{ color: '#234e52' }}>{successMsg}</p>
                         </div>
                     </div>
                 )}

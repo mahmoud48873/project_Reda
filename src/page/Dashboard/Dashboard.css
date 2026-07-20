@@ -400,6 +400,119 @@ body.dark .cancel_btn { background: #2a2a2a; color: #aaa; }
 body.dark .more_items { background: #1a2a3a; }
 body.dark .order_card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
 
+/* Custom Modal */
+.custom_modal_overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.custom_modal {
+    background: var(--white_color);
+    width: 90%;
+    max-width: 400px;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    animation: modalScaleIn 0.3s ease-out;
+}
+
+@keyframes modalScaleIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.custom_modal_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.custom_modal_header h3 {
+    font-size: 18px;
+    color: var(--color_heading);
+    margin: 0;
+}
+
+.close_modal_btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close_modal_btn:hover {
+    color: #ef4444;
+}
+
+.custom_modal_body {
+    margin-bottom: 24px;
+}
+
+.custom_modal_body p {
+    font-size: 15px;
+    color: var(--color_heading);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.custom_modal_footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn_modal_cancel {
+    padding: 8px 16px;
+    border: none;
+    background: #f1f5f9;
+    color: #475569;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn_modal_cancel:hover {
+    background: #e2e8f0;
+}
+
+.btn_modal_confirm {
+    padding: 8px 16px;
+    border: none;
+    background: #ef4444;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn_modal_confirm:hover {
+    background: #dc2626;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+body.dark .custom_modal {
+    background: #1e1e1e;
+    border: 1px solid #333;
+}
+body.dark .btn_modal_cancel {
+    background: #2a2a2a;
+    color: #aaa;
+}
+body.dark .btn_modal_cancel:hover {
+    background: #333;
+}
+
 @media (max-width: 768px) {
     .dashboard_page .container {
         grid-template-columns: 1fr;

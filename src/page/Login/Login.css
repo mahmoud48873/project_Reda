@@ -37,18 +37,19 @@
 
 .login_container h2 {
     color: #333;
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 700;
     margin-bottom: 6px;
 }
 
 .login_subtitle {
     color: #888;
-    font-size: 14px;
+    font-size: 13.5px;
+    line-height: 1.4;
 }
 
 .form_group {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .form_group label {
@@ -56,6 +57,7 @@
     margin-bottom: 8px;
     color: #555;
     font-weight: 500;
+    font-size: 14px;
 }
 
 .form_group input {
@@ -63,7 +65,7 @@
     padding: 12px 15px;
     border: 1.5px solid #ddd;
     border-radius: 8px;
-    font-size: 15px;
+    font-size: 14px;
     outline: none;
     transition: border-color 0.3s, box-shadow 0.3s;
     background: #fafafa;
@@ -103,14 +105,25 @@
     color: #0090f0;
 }
 
+/* RTL Mode Support for Password Input Toggle */
+body.rtl_mode .password_wrap input {
+    padding-right: 15px;
+    padding-left: 46px;
+}
+
+body.rtl_mode .toggle_password {
+    right: auto;
+    left: 14px;
+}
+
 .login_btn {
     width: 100%;
-    padding: 14px;
+    padding: 13px;
     background: linear-gradient(135deg, #0090f0, #0060c0);
     color: #fff;
     border: none;
     border-radius: 8px;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s;
@@ -119,7 +132,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    min-height: 50px;
+    min-height: 48px;
 }
 
 .login_btn:hover:not(:disabled) {
@@ -149,8 +162,9 @@
 
 .register_link, .login_link {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 18px;
     color: #666;
+    font-size: 14px;
 }
 
 .register_link a, .login_link a {
@@ -169,30 +183,35 @@
     gap: 15px;
     background: linear-gradient(135deg, #fff3f3 0%, #ffe6e6 100%);
     border-left: 5px solid #ff4b4b;
-    padding: 15px 20px;
+    padding: 14px 18px;
     border-radius: 8px;
-    margin-bottom: 25px;
+    margin-bottom: 22px;
     box-shadow: 0 4px 10px rgba(255, 75, 75, 0.1);
     animation: shakeError 0.5s ease-in-out;
 }
 
+body.rtl_mode .beautiful_error_box {
+    border-left: none;
+    border-right: 5px solid #ff4b4b;
+}
+
 .error_icon {
-    font-size: 35px;
+    font-size: 32px;
     color: #ff4b4b;
     flex-shrink: 0;
 }
 
 .error_content h4 {
-    margin: 0 0 5px 0;
+    margin: 0 0 4px 0;
     color: #d12c2c;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 700;
 }
 
 .error_content p {
     margin: 0;
     color: #555;
-    font-size: 14px;
+    font-size: 13.5px;
     line-height: 1.4;
 }
 
@@ -200,6 +219,45 @@
     0%, 100% { transform: translateX(0); }
     20%, 60% { transform: translateX(-5px); }
     40%, 80% { transform: translateX(5px); }
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 600px) {
+    .login_page {
+        padding: 20px 12px;
+        min-height: auto;
+    }
+
+    .login_container {
+        padding: 24px 18px;
+        border-radius: 12px;
+    }
+
+    .login_icon_wrap {
+        width: 50px;
+        height: 50px;
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+
+    .login_container h2 {
+        font-size: 20px;
+    }
+
+    .login_subtitle {
+        font-size: 12.5px;
+    }
+
+    .form_group input {
+        padding: 10px 12px;
+        font-size: 13.5px;
+    }
+
+    .login_btn {
+        padding: 11px;
+        font-size: 15px;
+        min-height: 44px;
+    }
 }
 
 /* Dark Mode */

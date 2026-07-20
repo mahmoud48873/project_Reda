@@ -166,21 +166,23 @@ body.dark .btm_header .category_nav_list a:hover {
 }
 .btm_header .category_nav .category_nav_list {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 8px);
   left: 0;
   width: 100%;
   background: var(--white_color);
-  border: 1px solid #999;
-  border-top: 0;
+  border: 1px solid var(--border_color);
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
   max-height: 400px;
   overflow-y: auto;
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
   clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
-  transition: 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 100;
+  padding: 8px 0;
 }
 
 .btm_header .category_nav .category_nav_list::-webkit-scrollbar {
@@ -190,9 +192,17 @@ body.dark .btm_header .category_nav_list a:hover {
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
 }
 .btm_header .category_nav .category_nav_list a {
-  padding: 14px 10px;
-  border-bottom: 1px solid var(--border_color);
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
   font-size: 14px;
+  font-weight: 500;
+  color: var(--color_heading);
+  transition: all 0.2s ease;
+}
+.btm_header .category_nav .category_nav_list a:hover {
+  background-color: #eff6ff;
+  color: #0090f0;
+  padding-left: 22px;
 }
 .btm_header .category_nav .category_btm {
   height: 100%;
@@ -567,6 +577,28 @@ body.dark .btm_header .category_nav_list a:hover {
 }
 
 /* User Menu */
+.admin_quick_btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--main-color) !important;
+  font-weight: 700;
+  font-size: 12.5px;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.admin_quick_btn:hover {
+  background: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 .user_menu_wrap {
   position: relative;
 }

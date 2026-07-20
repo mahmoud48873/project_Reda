@@ -8,6 +8,8 @@ import Cart from "./page/Cart/Cart";
 import Wishlist from "./page/Wishlist/Wishlist";
 import Login from "./page/Login/Login";
 import SignUp from "./page/SignUp/SignUp";
+import ForgotPassword from "./page/ForgotPassword/ForgotPassword";
+import AdminDashboard from "./page/AdminDashboard/AdminDashboard";
 import Search from "./page/Search/Search";
 import Category from "./page/Category/Category";
 import About from "./page/About/About";
@@ -34,6 +36,9 @@ function App() {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/search" element={<Search />} />
         <Route path="/category/:categoryName" element={<Category />} />
         <Route path="/about" element={<About />} />

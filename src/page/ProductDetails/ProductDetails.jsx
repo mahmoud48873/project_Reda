@@ -1,3 +1,6 @@
+// Developer: Mahmoud Sameh Fathy Ibrahim
+// Student Code: 624018
+
 import React, { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { IoStar, IoStarOutline } from "react-icons/io5";
@@ -49,30 +52,109 @@ function ProductDetails() {
   const [activeImage, setActiveImage] = useState("");
   const [isPaused, setIsPaused] = useState(false);
 
-  // Reviews state
+  // Reviews state & pagination
   const [reviews, setReviews] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [newRating, setNewRating] = useState(5);
-  const [reviewerName, setReviewerName] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [isEditingMyReview, setIsEditingMyReview] = useState(false);
+
+  const hasUserReviewed = user && reviews.some(rev => rev.reviewerName === user.email);
+
+  const getPaginationGroup = (current, total) => {
+    const pages = [];
+    for (let i = 1; i <= total; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
+
+  const reviewsPerPage = 5;
+  const totalPages = Math.ceil(reviews.length / reviewsPerPage);
+  const indexOfLastReview = currentPage * reviewsPerPage;
+  const indexOfFirstReview = indexOfLastReview - reviewsPerPage;
+  const currentReviews = reviews.slice(indexOfFirstReview, indexOfLastReview);
+
+  // Calculate average rating dynamically from reviews
+  const averageRating = reviews.length > 0
+    ? reviews.reduce((sum, rev) => sum + Number(rev.rating), 0) / reviews.length
+    : (product?.rating || 5.0);
+
+  // Helper for translation with fallback
+  const tr = (key, fallback) => {
+    if (!t) return fallback;
+    const res = t(key);
+    return (res && res !== key) ? res : fallback;
+  };
 
   useEffect(() => {
     const FetchData = async () => {
       setLoading(true);
       try {
+        // 1. Try fetching from Firestore first (for admin-added products)
+        try {
+          const { doc, getDoc } = await import('firebase/firestore');
+          const { db } = await import('../../firebase');
+          const docRef = doc(db, 'products', id);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const data = { id: docSnap.id, ...docSnap.data() };
+            const mainImg = data.imageUrl || data.thumbnail || (data.images && data.images[0]) || "";
+            const formattedImages = (data.images && data.images.length > 0) ? data.images : [mainImg];
+            
+            const fullProductData = {
+              ...data,
+              title: data.title || data.name || "Product",
+              images: formattedImages,
+              thumbnail: mainImg,
+              stock: data.stock !== undefined ? data.stock : 15,
+              rating: data.rating || 5.0,
+              description: (data.description && data.description !== "0" && data.description !== 0) ? data.description : ""
+            };
+
+            setProduct(fullProductData);
+            setActiveImage(mainImg);
+            setReviews(data.reviews && data.reviews.length > 0 ? data.reviews : []);
+            setLoading(false);
+            return;
+          }
+        } catch (fsErr) {
+          console.log("Firestore fetch fallback to DummyJSON:", fsErr);
+        }
+
+        // 2. Fallback to DummyJSON API
         const res = await fetch(`https://dummyjson.com/products/${id}`);
+        if (!res.ok) {
+          throw new Error("Product not found");
+        }
         const data = await res.json();
         setProduct(data);
         setActiveImage(data.images?.[0] || data.thumbnail || "");
-        setReviews(data.reviews || [
-          { reviewerName: "Sara Ahmed", comment: "Awesome quality, fast shipping!", rating: 5, date: new Date().toISOString() },
-          { reviewerName: "Omar Hassan", comment: "Good product for the price.", rating: 4, date: new Date().toISOString() }
-        ]);
+
+        let fetchedReviews = [];
+        try {
+            const { getDoc, doc } = await import('firebase/firestore');
+            const { db } = await import('../../firebase');
+            const reviewsDocRef = doc(db, 'product_reviews', String(id));
+            const reviewSnap = await getDoc(reviewsDocRef);
+            if (reviewSnap.exists() && reviewSnap.data().reviews) {
+                fetchedReviews = reviewSnap.data().reviews;
+            }
+        } catch (e) {
+            console.error("Error fetching dummyjson reviews from firestore", e);
+        }
+
+        setReviews(fetchedReviews);
         setLoading(false);
       } catch (error) {
-        console.error(error);
+        console.error("Error loading product details:", error);
+        setProduct(null);
         setLoading(false);
       }
     };
+
     FetchData();
   }, [id]);
 
@@ -93,10 +175,17 @@ function ProductDetails() {
 
   useEffect(() => {
     if (!product) return;
-    fetch(`https://dummyjson.com/products/category/${product.category}`)
+    const catToFetch = product.category || 'smartphones';
+    fetch(`https://dummyjson.com/products/category/${catToFetch}`)
       .then(res => res.json())
       .then(data => {
-        setRelatedProducts(data.products || []);
+        if (data.products && data.products.length > 0) {
+          setRelatedProducts(data.products);
+        } else {
+          fetch(`https://dummyjson.com/products/category/smartphones`)
+            .then(r => r.json())
+            .then(d => setRelatedProducts(d.products || []));
+        }
         setLoadingRelatedProducts(false);
       })
       .catch(error => {
@@ -105,25 +194,84 @@ function ProductDetails() {
       });
   }, [product]);
 
-  const handleAddReview = (e) => {
+  const handleAddReview = async (e) => {
     e.preventDefault();
-    const nameToUse = reviewerName.trim() || user?.name || (language === 'ar' ? "عميل" : "Anonymous Customer");
+    if (!user) {
+      showToast?.(tr('loginToReview', "Please login to write a review"), "error");
+      return;
+    }
     if (!newComment.trim()) {
-      showToast?.(t ? t('writeCommentPrompt') : "Please write a comment for your review", "error");
+      showToast?.(tr('writeCommentPrompt', "Please write a comment for your review"), "error");
       return;
     }
 
+    setIsSubmittingReview(true);
+
     const reviewObj = {
-      reviewerName: nameToUse,
+      reviewerName: user.email,
       comment: newComment.trim(),
       rating: Number(newRating),
       date: new Date().toISOString()
     };
 
-    setReviews([reviewObj, ...reviews]);
+    let updatedReviews;
+    if (isEditingMyReview) {
+      updatedReviews = reviews.map(rev => rev.reviewerName === user.email ? reviewObj : rev);
+    } else {
+      updatedReviews = [reviewObj, ...reviews];
+    }
+
+    try {
+      const { updateDoc, setDoc, doc, getDoc } = await import('firebase/firestore');
+      const { db } = await import('../../firebase');
+      const docRef = doc(db, 'products', String(id));
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        await updateDoc(docRef, { reviews: updatedReviews });
+      } else {
+        const reviewsDocRef = doc(db, 'product_reviews', String(id));
+        await setDoc(reviewsDocRef, { reviews: updatedReviews }, { merge: true });
+      }
+    } catch (err) {
+      console.error("Error saving review to Firestore:", err);
+    }
+
+    setReviews(updatedReviews);
     setNewComment("");
-    setReviewerName("");
-    showToast?.(t ? t('reviewSubmitted') : "Thank you! Your review has been added.", "success");
+    setCurrentPage(1);
+    setIsSubmittingReview(false);
+    setIsEditingMyReview(false);
+    showToast?.(
+      isEditingMyReview 
+        ? (language === 'ar' ? "تم تعديل تقييمك بنجاح." : "Your review has been updated.")
+        : tr('reviewSubmitted', "Thank you! Your review has been added."), 
+      "success"
+    );
+  };
+
+  const handleDeleteReview = async () => {
+    if (!window.confirm(language === 'ar' ? 'هل أنت متأكد من حذف تقييمك؟' : 'Are you sure you want to delete your review?')) return;
+    setIsSubmittingReview(true);
+    const updatedReviews = reviews.filter(rev => rev.reviewerName !== user.email);
+    try {
+      const { updateDoc, setDoc, doc, getDoc } = await import('firebase/firestore');
+      const { db } = await import('../../firebase');
+      const docRef = doc(db, 'products', String(id));
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        await updateDoc(docRef, { reviews: updatedReviews });
+      } else {
+        const reviewsDocRef = doc(db, 'product_reviews', String(id));
+        await setDoc(reviewsDocRef, { reviews: updatedReviews }, { merge: true });
+      }
+    } catch (err) {
+      console.error("Error deleting review:", err);
+    }
+    setReviews(updatedReviews);
+    setCurrentPage(1);
+    setIsSubmittingReview(false);
+    showToast?.(language === 'ar' ? "تم حذف التقييم بنجاح." : "Review deleted successfully.", "success");
   };
 
   if (loading) {
@@ -131,17 +279,19 @@ function ProductDetails() {
   }
 
   if (!product) {
-    return <div className="container" style={{ padding: "60px 0", textAlign: "center" }}>{t ? t('productNotFound') : "Product not found"}</div>;
+    return <div className="container" style={{ padding: "60px 0", textAlign: "center" }}>{tr('productNotFound', "Product not found")}</div>;
   }
 
   const isCompared = isInCompare ? isInCompare(product.id) : false;
 
   const getStockStatusText = () => {
     if (product.stock > 0) {
-      return t ? t('inStock') : "In Stock";
+      return tr('inStock', "In Stock");
     }
-    return t ? t('outOfStock') : "Out of Stock";
+    return tr('outOfStock', "Out of Stock");
   };
+
+  const productMainImage = activeImage || product.imageUrl || product.thumbnail || product.images?.[0] || "";
 
   return (
     <div className="product_details_page">
@@ -155,168 +305,239 @@ function ProductDetails() {
             onTouchEnd={() => setIsPaused(false)}
           >
             <div className="bag_img">
-              <img id="bag_img" src={activeImage || product.images?.[0] || product.thumbnail} alt={product.title} />
+              <img id="bag_img" src={productMainImage} alt={product.title || product.name} />
             </div>
-            <div className="sma_img">
-              {product.images?.map((img, index) => (
-                <img
-                  key={index}
-                  src={img}
-                  alt={product.title}
-                  className={activeImage === img ? "active_thumb" : ""}
-                  onClick={() => setActiveImage(img)}
-                  onError={(e) => { e.target.style.display = 'none'; }}
-                />
-              ))}
-            </div>
+            {product.images && product.images.length > 1 && (
+              <div className="sma_img">
+                {product.images.map((img, index) => (
+                  <img
+                    key={index}
+                    src={img}
+                    alt={product.title || product.name}
+                    className={activeImage === img ? "active_thumb" : ""}
+                    onClick={() => setActiveImage(img)}
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="details_item">
-            <h1 className="title_item">{product.title}</h1>
+            <h1 className="title_item">{product.title || product.name}</h1>
             <div className="rating_wrap">
-              <div className="starts">{renderStars(product.rating || 4.5)}</div>
-              <span className="rating_num">({product.rating?.toFixed(1) || 4.5})</span>
-              <span className="review_count">• {reviews.length} {t ? t('reviewsCountLabel') : 'reviews'}</span>
+              <div className="starts">{renderStars(averageRating)}</div>
+              <span className="rating_num">({averageRating.toFixed(1)})</span>
+              <span className="review_count">• {reviews.length} {tr('reviewsCountLabel', 'reviews')}</span>
             </div>
 
             <p className="price_item">
               ${product.price}
               {product.discountPercentage > 0 && (
-                <span className="discount_tag">-{Math.round(product.discountPercentage)}% {t ? t('off') : 'OFF'}</span>
+                <span className="discount_tag">-{Math.round(product.discountPercentage)}% {tr('off', 'OFF')}</span>
               )}
             </p>
 
             <p className="availability_item">
-              {t ? t('availabilityLabel') : 'Availability'}: <span className={product.stock > 0 ? "in_stock" : "out_stock"}>{getStockStatusText()}</span>
+              {tr('availabilityLabel', 'Availability')}: <span className={product.stock > 0 ? "in_stock" : "out_stock"}>{getStockStatusText()}</span>
             </p>
-            <p className="brand_item">{t ? t('brandLabel') : 'Brand'}: <span>{product.brand || (t ? t('genericBrand') : "Generic")}</span></p>
-            <p className="description_item">{product.description}</p>
-            <p className="stock_item">{t ? t('stockLabel') : 'Stock'}: <span>{product.stock} {t ? t('itemsLeft') : 'items left'}</span></p>
+            <p className="brand_item">{tr('brandLabel', 'Brand')}: <span>{product.brand || tr('genericBrand', "Generic")}</span></p>
+            
+            {product.description && product.description !== "0" && product.description !== 0 && (
+              <p className="description_item">{product.description}</p>
+            )}
+
+            <p className="stock_item">{tr('stockLabel', 'Stock')}: <span>{product.stock ?? 15} {tr('itemsLeft', 'items left')}</span></p>
 
             <div className="actions_row">
               <button className="add_to_cart btn btn-primary" onClick={() => addToCart(product)}>
-                <FaCartPlus /> {t ? t('addToCart') : 'Add to Cart'}
+                <FaCartPlus /> {tr('addToCart', 'Add to Cart')}
+              </button>
+
+              <button className="btn btn_wishlist_page" onClick={() => addToWishlist(product)}>
+                <FaHeart /> {tr('wishlist', 'Wishlist')}
               </button>
 
               <button
-                className={`compare_btn ${isCompared ? "compared" : ""}`}
+                className={`btn btn_compare_page ${isCompared ? "compared" : ""}`}
                 onClick={() => addToCompare && addToCompare(product)}
-                title={t ? t('compareProduct') : "Compare Product"}
               >
-                <FaBalanceScale /> {isCompared ? (t ? t('compared') : "Compared") : (t ? t('compare') : "Compare")}
+                <FaBalanceScale /> {tr('compare', 'Compare')}
               </button>
-            </div>
-
-            <div className="icons">
-              <span
-                onClick={() => addToWishlist(product)}
-                style={{ color: (product && wishlistItems.some(item => item.id === product.id)) ? "#ff6b6b" : "inherit", cursor: "pointer" }}
-                title={t ? t('wishlist') : "Wishlist"}
-              >
-                {(product && wishlistItems.some(item => item.id === product.id)) ? <FaHeart /> : <CiHeart />}
-              </span>
-
-              <span style={{ position: 'relative', cursor: 'pointer' }} title={t ? t('share') : "Share"}>
-                <FaShare onClick={(e) => { e.preventDefault(); setShowShare(!showShare); }} />
-                {showShare && (
-                  <div className="share_menu">
-                    <FaWhatsapp size={22} color="#25D366" onClick={(e) => { e.preventDefault(); window.open(`https://wa.me/?text=Check this out: ${window.location.origin}/products/${product.id}`) }} />
-                    <FaFacebook size={22} color="#1877F2" onClick={(e) => { e.preventDefault(); window.open(`https://www.facebook.com/sharer/sharer.php?u=${window.location.origin}/products/${product.id}`) }} />
-                    <FaLink size={22} color="#333" onClick={(e) => { e.preventDefault(); navigator.clipboard.writeText(`${window.location.origin}/products/${product.id}`); showToast ? showToast(t ? t('linkCopied') : "Link copied!", "info") : alert('Link copied!'); }} />
-                  </div>
-                )}
-              </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Product Reviews Section */}
+      {/* Customer Reviews Section */}
       <div className="reviews_section">
         <div className="container">
-          <div className="reviews_header">
-            <div className="reviews_header_title">
-              <h2>{t ? t('customerReviews') : 'Customer Reviews'}</h2>
-              <span className="reviews_count_badge">{reviews.length} {t ? t('reviewsCountLabel') : 'reviews'}</span>
-            </div>
-            <div className="overall_rating">
-              <span className="big_rating">{product.rating?.toFixed(1) || 4.5}</span>
-              <div>
-                <div className="starts">{renderStars(product.rating || 4.5)}</div>
-                <p>{t ? t('basedOnReviews') : 'Based on customer experiences'}</p>
-              </div>
-            </div>
-          </div>
-
+          <h3 className="section_title" style={{ fontSize: '20px', fontWeight: '700', marginBottom: '20px', color: 'var(--color_heading)' }}>
+            {tr('customerReviews', 'Customer Reviews')}
+          </h3>
+          
           <div className="reviews_grid">
-            {/* Review Form */}
-            <form className="add_review_form" onSubmit={handleAddReview}>
-              <h3>{t ? t('writeReview') : 'Write a Review'}</h3>
-              <div className="form_group">
-                <label>{t ? t('yourName') : 'Your Name'}</label>
-                <input
-                  type="text"
-                  placeholder={user?.name || (t ? t('enterYourName') : "Enter your name")}
-                  value={reviewerName}
-                  onChange={(e) => setReviewerName(e.target.value)}
-                />
-              </div>
-
-              <div className="form_group">
-                <label>{t ? t('ratingLabel') : 'Rating'}</label>
-                <select value={newRating} onChange={(e) => setNewRating(e.target.value)}>
-                  <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
-                  <option value="4">⭐⭐⭐⭐ (4/5)</option>
-                  <option value="3">⭐⭐⭐ (3/5)</option>
-                  <option value="2">⭐⭐ (2/5)</option>
-                  <option value="1">⭐ (1/5)</option>
-                </select>
-              </div>
-
-              <div className="form_group">
-                <label>{t ? t('yourReview') : 'Your Review'}</label>
-                <textarea
-                  rows="4"
-                  placeholder={t ? t('reviewPlaceholder') : "Share your thoughts about this product..."}
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  required
-                ></textarea>
-              </div>
-
-              <button type="submit" className="btn btn-primary submit_review_btn">
-                <FaPaperPlane /> {t ? t('submitReview') : 'Submit Review'}
-              </button>
-            </form>
-
-            {/* List of Reviews */}
             <div className="reviews_list">
-              {reviews.map((rev, idx) => (
-                <div className="review_card" key={idx}>
-                  <div className="review_card_top">
-                    <div className="reviewer_info">
-                      <FaUserCircle className="reviewer_avatar" />
-                      <div>
-                        <h4>{rev.reviewerName}</h4>
-                        <span className="review_date">
-                          {rev.date ? new Date(rev.date).toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : (t ? t('recently') : 'Recently')}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="starts">{renderStars(rev.rating)}</div>
-                  </div>
-                  <p className="review_comment">{rev.comment}</p>
+              {reviews.length === 0 ? (
+                <div className="no_reviews_box">
+                  <p>{language === 'ar' ? 'لا توجد تقييمات لهذا المنتج بعد. كن أول من يكتب تقييماً!' : 'No reviews for this product yet. Be the first to write a review!'}</p>
                 </div>
-              ))}
+              ) : (
+                currentReviews.map((rev, index) => (
+                  <div key={index} className="review_card">
+                    <div className="review_card_top">
+                      <div className="reviewer_info">
+                        <FaUserCircle className="reviewer_avatar" />
+                        <div className="reviewer_details">
+                          <h4 className="reviewer_name">{rev.reviewerName}</h4>
+                          <div className="review_stars">{renderStars(rev.rating)}</div>
+                        </div>
+                      </div>
+                      <span className="review_date">{new Date(rev.date).toLocaleDateString()}</span>
+                    </div>
+                    <p className="review_comment">{rev.comment}</p>
+                  </div>
+                ))
+              )}
+
+              {totalPages > 1 && (
+                <div className="reviews_pagination">
+                  <button
+                    type="button"
+                    className="pagination_btn"
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                  >
+                    {language === 'ar' ? 'السابق' : 'Previous'}
+                  </button>
+
+                  <div className="pagination_numbers">
+                    {getPaginationGroup(currentPage, totalPages).map((item, idx) => (
+                      item === '...' ? (
+                        <span key={`dots-${idx}`} className="pagination_ellipsis">...</span>
+                      ) : (
+                        <button
+                          key={item}
+                          type="button"
+                          className={`page_num_btn ${currentPage === item ? 'active' : ''}`}
+                          onClick={() => setCurrentPage(item)}
+                        >
+                          {item}
+                        </button>
+                      )
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    className="pagination_btn"
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                  >
+                    {language === 'ar' ? 'التالي' : 'Next'}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="add_review_form">
+              <h3>{tr('writeAReview', 'Write a Review')}</h3>
+              {!user ? (
+                <p className="login_prompt">{tr('loginToReview', 'Please login to write a review')}</p>
+              ) : (hasUserReviewed && !isEditingMyReview) ? (
+                <div className="already_reviewed_box">
+                  <p>{language === 'ar' ? 'لقد قمت بتقييم هذا المنتج مسبقاً' : 'You have already reviewed this product'}</p>
+                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+                    <button 
+                      type="button" 
+                      className="edit_review_btn" 
+                      onClick={() => {
+                        const userReview = reviews.find(rev => rev.reviewerName === user.email);
+                        if (userReview) {
+                          setNewComment(userReview.comment);
+                          setNewRating(userReview.rating);
+                          setIsEditingMyReview(true);
+                        }
+                      }}
+                    >
+                      {language === 'ar' ? 'تعديل التقييم ✏️' : 'Edit Review ✏️'}
+                    </button>
+                    <button 
+                      type="button" 
+                      className="delete_review_btn" 
+                      onClick={handleDeleteReview}
+                      disabled={isSubmittingReview}
+                    >
+                      {language === 'ar' ? 'حذف التقييم 🗑️' : 'Delete Review 🗑️'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleAddReview}>
+                  <div className="logged_in_as">
+                    <FaUserCircle className="logged_in_avatar" />
+                    <span>{user.email}</span>
+                  </div>
+                  <div className="form_group">
+                    <label>{tr('rating', 'Rating')}</label>
+                    <select value={newRating} onChange={(e) => setNewRating(e.target.value)}>
+                      <option value="5">⭐⭐⭐⭐⭐ (5/5)</option>
+                      <option value="4">⭐⭐⭐⭐ (4/5)</option>
+                      <option value="3">⭐⭐⭐ (3/5)</option>
+                      <option value="2">⭐⭐ (2/5)</option>
+                      <option value="1">⭐ (1/5)</option>
+                    </select>
+                  </div>
+                  <div className="form_group">
+                    <label>{tr('yourReview', 'Your Review')}</label>
+                    <textarea
+                      rows="4"
+                      placeholder={tr('writeReviewPlaceholder', "Write your honest feedback about this product...")}
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      required
+                      disabled={isSubmittingReview}
+                      maxLength={120}
+                    ></textarea>
+                    <small style={{ display: 'block', textAlign: 'right', color: newComment.length === 120 ? '#ef4444' : '#888', marginTop: '6px', fontSize: '13px' }}>
+                      {newComment.length} / 120
+                    </small>
+                  </div>
+                  <button type="submit" className="submit_review_btn" disabled={isSubmittingReview}>
+                    <FaPaperPlane /> 
+                    {isSubmittingReview 
+                      ? (language === 'ar' ? 'جاري الحفظ...' : 'Saving...') 
+                      : (isEditingMyReview 
+                          ? (language === 'ar' ? 'تحديث التقييم' : 'Update Review') 
+                          : tr('submitReview', 'Submit Review'))
+                    }
+                  </button>
+                  {isEditingMyReview && (
+                    <button 
+                      type="button" 
+                      className="cancel_edit_review_btn" 
+                      onClick={() => {
+                        setIsEditingMyReview(false);
+                        setNewComment("");
+                        setNewRating(5);
+                      }}
+                      disabled={isSubmittingReview}
+                    >
+                      {language === 'ar' ? 'إلغاء التعديل' : 'Cancel Edit'}
+                    </button>
+                  )}
+                </form>
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {loadingRelatedProducts ? (
-        <Loading />
-      ) : (
-        <SilederProduct key={product.category} data={relatedProducts} title={product.category} />
+      {/* Related Products */}
+      {!loadingRelatedProducts && relatedProducts.length > 0 && (
+        <div className="related_products_section">
+          <SilederProduct data={relatedProducts} title={tr('relatedProducts', 'Related Products')} />
+        </div>
       )}
     </div>
   );

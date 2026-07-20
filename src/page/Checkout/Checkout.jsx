@@ -14,6 +14,8 @@ import { UserContext } from '../../components/context/UserContext';
 import { ToastContext } from '../../components/context/ToastContext';
 import { LanguageContext } from '../../components/context/LanguageContext';
 import { FaShippingFast, FaCreditCard, FaMoneyBillWave, FaLock } from 'react-icons/fa';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
 import './Checkout.css';
 
 const stripePromise = loadStripe('pk_test_51Turd1B5gNPSqgtEWN1cdMt5fOReZwO0a595K49WnpSSEZc4l8B2ceFEzumW62CWQOgATBd7BUCEuxqLqxSdH4kd00IoJ9A2wK');
@@ -138,6 +140,23 @@ function CheckoutForm() {
         };
 
         await saveOrder(order);
+
+        // Decrease stock in Firestore for each ordered item
+        try {
+            for (const item of CartItem) {
+                const productRef = doc(db, 'products', String(item.id));
+                const productSnap = await getDoc(productRef);
+                if (productSnap.exists()) {
+                    const currentStock = productSnap.data().stock ?? 0;
+                    const orderedQty = item.quantity || 1;
+                    const newStock = Math.max(0, currentStock - orderedQty);
+                    await updateDoc(productRef, { stock: newStock });
+                }
+            }
+        } catch (stockErr) {
+            console.error('Error updating stock:', stockErr);
+        }
+
         try {
             sessionStorage.setItem('last_order', JSON.stringify(order));
         } catch (e) {

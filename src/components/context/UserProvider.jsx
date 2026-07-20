@@ -230,6 +230,55 @@ export default function UserProvider({ children }) {
         return JSON.parse(localStorage.getItem(key) || '[]');
     };
 
+    // 8. Cancel Order & Restore Stock in Firestore
+    const cancelOrder = async (orderToCancel) => {
+        if (!user || !user.uid || !orderToCancel) return;
+
+        try {
+            // Update order status in user subcollection if order has id
+            if (orderToCancel.id) {
+                const userOrderRef = doc(db, 'users', user.uid, 'orders', orderToCancel.id);
+                await updateDoc(userOrderRef, { status: 'Cancelled' });
+            }
+
+            // Update order status in global collection
+            if (orderToCancel.trackingNumber) {
+                const globalOrderRef = doc(db, 'orders', orderToCancel.trackingNumber);
+                await updateDoc(globalOrderRef, { status: 'Cancelled' });
+            }
+
+            // Restore Stock for each product in the order
+            if (orderToCancel.items && orderToCancel.items.length > 0) {
+                for (const item of orderToCancel.items) {
+                    try {
+                        const productRef = doc(db, 'products', String(item.id));
+                        const productSnap = await getDoc(productRef);
+                        if (productSnap.exists()) {
+                            const currentStock = productSnap.data().stock ?? 0;
+                            const restoredQty = item.quantity || 1;
+                            await updateDoc(productRef, { stock: currentStock + restoredQty });
+                        }
+                    } catch (prodErr) {
+                        console.error("Error restoring product stock:", prodErr);
+                    }
+                }
+            }
+
+            // Update local storage fallback
+            const key = `orders_${user.email}`;
+            const localOrders = JSON.parse(localStorage.getItem(key) || '[]');
+            const updatedLocal = localOrders.map(o => 
+                o.trackingNumber === orderToCancel.trackingNumber ? { ...o, status: 'Cancelled' } : o
+            );
+            localStorage.setItem(key, JSON.stringify(updatedLocal));
+
+            return true;
+        } catch (error) {
+            console.error("Error cancelling order:", error);
+            throw error;
+        }
+    };
+
     // Helper for legacy lookups
     const getUser = (email) => {
         if (user && user.email === email) return user;
@@ -245,7 +294,8 @@ export default function UserProvider({ children }) {
             logout, 
             updateUser, 
             saveOrder, 
-            getOrders, 
+            getOrders,
+            cancelOrder,
             getUser 
         }}>
             {children}
