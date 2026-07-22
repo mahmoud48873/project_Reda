@@ -340,6 +340,48 @@
     color: #888;
 }
 
+.order_delivery_timeline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 12px;
+    background: #f1f5f9;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+}
+
+.order_date_created {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #64748b;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.timeline_arrow {
+    color: #0090f0;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.order_date_delivery {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #16a34a;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.order_date_delivery svg {
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
 .order_status {
     font-size: 12px;
     font-weight: 600;

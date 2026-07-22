@@ -1,3 +1,5 @@
+// Developer: Mahmoud Sameh Fathy Ibrahim
+// Student Code: 624018
 import { useState, useEffect, useContext } from 'react';
 import { WishlistContext } from './WishlistContext';
 import { ToastContext } from './ToastContext';
@@ -33,6 +35,7 @@ export default function WishlistProvider({ children }) {
         };
 
         fetchFirestoreWishlist();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.uid]);
 
     // Helper function to sync wishlist with local state, LocalStorage, and Firestore

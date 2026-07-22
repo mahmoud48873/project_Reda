@@ -1,10 +1,16 @@
+// Developer: Mahmoud Sameh Fathy Ibrahim
+// Student Code: 624018
+
 import React, { useContext } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import { Autoplay, Pagination  } from "swiper/modules";
-import { Link } from "react-router-dom";
 import { LanguageContext } from "../context/LanguageContext";
+
+import banner1 from "../../img/banner_Hero1.jpg";
+import banner2 from "../../img/banner_Hero2.jpg";
+import banner3 from "../../img/banner_Hero3.jpg";
 
 export default function HeroSlider() {
   const { t } = useContext(LanguageContext) || {};
@@ -30,11 +36,8 @@ export default function HeroSlider() {
                   {t ? t('heroTitle1') : 'Microsoft Xbox 360 Controller'}
                 </h3>
                 <p>{t ? t('heroDesc1') : 'Windows 11 Compatible'}</p>
-                <Link to="/" className="btn">
-                  {t ? t('shopNow') : 'Shop Now'}
-                </Link>
               </div>
-              <img src="/src/img/banner_Hero1.jpg" alt="Banner 1" />
+              <img src={banner1} alt="Banner 1" />
             </SwiperSlide>
             <SwiperSlide>
               <div className="content">
@@ -43,11 +46,8 @@ export default function HeroSlider() {
                   {t ? t('heroTitle1') : 'Microsoft Xbox 360 Controller'}
                 </h3>
                 <p>{t ? t('heroDesc1') : 'Windows 11 Compatible'}</p>
-                <Link to="/" className="btn">
-                  {t ? t('shopNow') : 'Shop Now'}
-                </Link>
               </div>
-              <img src="/src/img/banner_Hero2.jpg" alt="Banner 2" />
+              <img src={banner2} alt="Banner 2" />
             </SwiperSlide>
             <SwiperSlide>
               <div className="content">
@@ -56,11 +56,8 @@ export default function HeroSlider() {
                   {t ? t('heroTitle1') : 'Microsoft Xbox 360 Controller'}
                 </h3>
                 <p>{t ? t('heroDesc1') : 'Windows 11 Compatible'}</p>
-                <Link to="/" className="btn">
-                  {t ? t('shopNow') : 'Shop Now'}
-                </Link>
               </div>
-              <img src="/src/img/banner_Hero3.jpg" alt="Banner 3" />
+              <img src={banner3} alt="Banner 3" />
             </SwiperSlide>
           </Swiper>
         </div>

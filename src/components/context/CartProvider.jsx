@@ -1,3 +1,5 @@
+// Developer: Mahmoud Sameh Fathy Ibrahim
+// Student Code: 624018
 import { useState, useEffect, useContext } from 'react';
 import { CartContext } from './CartContext';
 import { ToastContext } from './ToastContext';
@@ -34,6 +36,7 @@ export default function CartProvider({ children }) {
         };
 
         fetchFirestoreCart();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.uid]);
 
     // Helper function to sync cart with local state, LocalStorage, and Firestore

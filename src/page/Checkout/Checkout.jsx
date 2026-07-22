@@ -1,4 +1,6 @@
-import React, { useState, useContext, useRef, useEffect } from 'react';
+// Developer: Mahmoud Sameh Fathy Ibrahim
+// Student Code: 624018
+import React, { useState, useContext, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { 
@@ -72,13 +74,13 @@ function CheckoutForm() {
         paymentMethod: 'cod',
     });
     const [isProcessing, setIsProcessing] = useState(false);
-    const orderPlacedRef = useRef(false);
+    const [orderPlaced, setOrderPlaced] = useState(false);
 
     useEffect(() => {
-        if (!orderPlacedRef.current && !isProcessing && CartItem.length === 0) {
+        if (!orderPlaced && !isProcessing && CartItem.length === 0) {
             navigate('/cart');
         }
-    }, [CartItem.length, isProcessing, navigate]);
+    }, [CartItem.length, isProcessing, navigate, orderPlaced]);
 
     const handleChange = (e) => {
         setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -125,7 +127,7 @@ function CheckoutForm() {
 
         await new Promise(res => setTimeout(res, 1500));
 
-        orderPlacedRef.current = true;
+        setOrderPlaced(true);
         const trackingNumber = 'RDA-' + Math.random().toString(36).substring(2, 8).toUpperCase();
         const order = {
             trackingNumber,
@@ -166,7 +168,7 @@ function CheckoutForm() {
         navigate('/order-success', { state: { order }, replace: true });
     };
 
-    if (!orderPlacedRef.current && !isProcessing && CartItem.length === 0) {
+    if (!orderPlaced && !isProcessing && CartItem.length === 0) {
         return null;
     }
 

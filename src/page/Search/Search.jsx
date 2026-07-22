@@ -1,3 +1,5 @@
+// Developer: Mahmoud Sameh Fathy Ibrahim
+// Student Code: 624018
 import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 import Product from '../../components/sliderProducts/Product';
@@ -23,6 +25,7 @@ function Search() {
 
     useEffect(() => {
         if (!query) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setProducts([]);
             setLoading(false);
             return;

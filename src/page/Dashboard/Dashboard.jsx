@@ -1,9 +1,11 @@
+// Developer: Mahmoud Sameh Fathy Ibrahim
+// Student Code: 624018
 import React, { useContext, useState } from 'react';
 import { UserContext } from '../../components/context/UserContext';
 import { ToastContext } from '../../components/context/ToastContext';
 import { LanguageContext } from '../../components/context/LanguageContext';
 import { useNavigate } from 'react-router-dom';
-import { FaUser, FaBox, FaHeart, FaEdit, FaSave, FaTimes, FaShoppingBag, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
+import { FaUser, FaBox, FaHeart, FaEdit, FaSave, FaTimes, FaShoppingBag, FaMapMarkerAlt, FaPhone, FaArrowRight, FaTruck } from 'react-icons/fa';
 import './Dashboard.css';
 
 function Dashboard() {
@@ -16,7 +18,7 @@ function Dashboard() {
     const [editData, setEditData] = useState({ name: user?.name || '', phone: user?.phone || '', address: user?.address || '' });
 
     const [orders, setOrders] = useState([]);
-    const [loadingOrders, setLoadingOrders] = useState(true);
+    const [, setLoadingOrders] = useState(true);
 
     const [cancelModalData, setCancelModalData] = useState({ isOpen: false, order: null });
 
@@ -52,6 +54,7 @@ function Dashboard() {
             }
         };
         fetchUserOrders();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const handleSave = () => {
@@ -181,38 +184,72 @@ function Dashboard() {
                                 </div>
                             ) : (
                                 <div className="orders_list">
-                                    {orders.map((order, idx) => (
-                                        <div key={idx} className="order_card">
-                                            <div className="order_card_header">
-                                                <div>
-                                                    <span className="order_id">Order #{order.trackingNumber}</span>
-                                                    <span className="order_date">{new Date(order.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                    {orders.map((order, idx) => {
+                                        const orderDate = new Date(order.date || Date.now());
+                                        const deliveryDate = new Date(orderDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+                                        const formattedOrderDate = orderDate.toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+                                        const formattedDeliveryDate = deliveryDate.toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+
+                                        return (
+                                            <div key={idx} className="order_card">
+                                                <div className="order_card_header">
+                                                    <div>
+                                                        <span className="order_id">Order #{order.trackingNumber}</span>
+                                                        <div className="order_delivery_timeline">
+                                                            <span className="order_date_created" title={language === 'ar' ? 'تاريخ الطلب' : 'Order Date'}>
+                                                                📅 {formattedOrderDate}
+                                                            </span>
+                                                            <FaArrowRight className="timeline_arrow" style={{ transform: language === 'ar' ? 'rotate(180deg)' : 'none' }} />
+                                                            <span className="order_date_delivery" title={language === 'ar' ? 'تاريخ الاستلام المتوقع' : 'Expected Delivery Date'}>
+                                                                <FaTruck />
+                                                                <span>{language === 'ar' ? 'الاستلام:' : 'Est. Delivery:'} {formattedDeliveryDate}</span>
+                                                             </span>
+                                                        </div>
+                                                    </div>
+                                                    <span className="order_status" style={{ backgroundColor: getStatusColor(order.status) + '22', color: getStatusColor(order.status), border: `1px solid ${getStatusColor(order.status)}` }}>
+                                                        {order.status}
+                                                    </span>
                                                 </div>
-                                                <span className="order_status" style={{ backgroundColor: getStatusColor(order.status) + '22', color: getStatusColor(order.status), border: `1px solid ${getStatusColor(order.status)}` }}>
-                                                    {order.status}
-                                                </span>
+                                                <div className="order_items_preview">
+                                                    {order.items?.slice(0, 3).map((item, i) => (
+                                                        <div key={i} style={{ position: 'relative', display: 'inline-block' }}>
+                                                            <img src={item.images?.[0]} alt={item.title} title={`${item.title} (${item.quantity || 1}x)`} />
+                                                            {(item.quantity > 1) && (
+                                                                <span style={{
+                                                                    position: 'absolute',
+                                                                    top: '-5px',
+                                                                    right: '-5px',
+                                                                    background: '#0090f0',
+                                                                    color: '#fff',
+                                                                    fontSize: '11px',
+                                                                    fontWeight: 'bold',
+                                                                    padding: '1px 6px',
+                                                                    borderRadius: '10px',
+                                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.15)'
+                                                                }}>
+                                                                    x{item.quantity}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                    {order.items?.length > 3 && <span className="more_items">+{order.items.length - 3}</span>}
+                                                </div>
+                                                <div className="order_card_footer">
+                                                    <span>{order.items?.length} item{order.items?.length !== 1 ? 's' : ''}</span>
+                                                    <strong className="order_total">${order.total?.toFixed(2)}</strong>
+                                                    {order.status !== 'Cancelled' && (
+                                                        <button 
+                                                            type="button"
+                                                            onClick={() => handleCancelOrderClick(order)}
+                                                            style={{ marginLeft: 'auto', padding: '6px 12px', background: '#fee2e2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
+                                                        >
+                                                            Cancel Order
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div className="order_items_preview">
-                                                {order.items?.slice(0, 3).map((item, i) => (
-                                                    <img key={i} src={item.images?.[0]} alt={item.title} title={item.title} />
-                                                ))}
-                                                {order.items?.length > 3 && <span className="more_items">+{order.items.length - 3}</span>}
-                                            </div>
-                                            <div className="order_card_footer">
-                                                <span>{order.items?.length} item{order.items?.length !== 1 ? 's' : ''}</span>
-                                                <strong className="order_total">${order.total?.toFixed(2)}</strong>
-                                                {order.status !== 'Cancelled' && (
-                                                    <button 
-                                                        type="button"
-                                                        onClick={() => handleCancelOrderClick(order)}
-                                                        style={{ marginLeft: 'auto', padding: '6px 12px', background: '#fee2e2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' }}
-                                                    >
-                                                        Cancel Order
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>

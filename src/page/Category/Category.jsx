@@ -1,3 +1,5 @@
+// Developer: Mahmoud Sameh Fathy Ibrahim
+// Student Code: 624018
 import React, { useState, useEffect, useMemo, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import Product from '../../components/sliderProducts/Product';
@@ -19,6 +21,7 @@ function Category() {
     const [selectedBrand, setSelectedBrand] = useState('');
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoading(true);
         fetch(`https://dummyjson.com/products/category/${categoryName}`)
             .then(res => res.json())

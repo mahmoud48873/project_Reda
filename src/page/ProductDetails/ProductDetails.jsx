@@ -6,10 +6,8 @@ import { useParams } from "react-router-dom";
 import { IoStar, IoStarOutline } from "react-icons/io5";
 import { IoMdStarHalf } from "react-icons/io";
 import './ProductDetails.css';
-import { FaCartPlus, FaShare, FaHeart, FaWhatsapp, FaFacebook, FaLink, FaBalanceScale, FaUserCircle, FaPaperPlane } from "react-icons/fa";
-import { CiHeart } from "react-icons/ci";
+import { FaCartPlus, FaHeart, FaBalanceScale, FaUserCircle, FaPaperPlane } from "react-icons/fa";
 import SilederProduct from "../../components/sliderProducts/SilederProduct";
-import Loading from "../../components/loading/Loading";
 import ProductLoading from "../../components/loading/ProductLoading";
 import { CartContext } from "../../components/context/CartContext";
 import { WishlistContext } from "../../components/context/WishlistContext";
@@ -37,18 +35,17 @@ function renderStars(rating = 5) {
 
 function ProductDetails() {
   const { addToCart } = useContext(CartContext);
-  const { addToWishlist, wishlistItems } = useContext(WishlistContext);
+  const { addToWishlist } = useContext(WishlistContext);
   const { addToCompare, isInCompare } = useContext(CompareContext) || {};
   const { showToast } = useContext(ToastContext) || {};
   const { user } = useContext(UserContext) || {};
-  const { t, language, tCategory } = useContext(LanguageContext) || {};
+  const { t, language } = useContext(LanguageContext) || {};
   const { id } = useParams();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loadingRelatedProducts, setLoadingRelatedProducts] = useState(true);
-  const [showShare, setShowShare] = useState(false);
   const [activeImage, setActiveImage] = useState("");
   const [isPaused, setIsPaused] = useState(false);
 

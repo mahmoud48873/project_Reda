@@ -40,7 +40,6 @@ function AdminDashboard() {
     const [isFetchingProducts, setIsFetchingProducts] = useState(false);
 
     const { showToast } = useContext(ToastContext) || {};
-    const { t } = useContext(LanguageContext) || { t: (key) => key };
 
     // Fetch existing products from Firestore
     const fetchProductsList = async () => {
