@@ -34,25 +34,32 @@ export default function UserProvider({ children }) {
                     const userSnap = await getDoc(userDocRef);
 
                     if (userSnap.exists()) {
-                        setUser({ uid: firebaseUser.uid, ...userSnap.data() });
+                        const userData = userSnap.data();
+                        const userName = userData.name || firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User';
+                        const userAvatar = (userData.avatar && typeof userData.avatar === 'string' && userData.avatar.trim() !== '') 
+                            ? userData.avatar 
+                            : (firebaseUser.photoURL || generateAvatar(userName));
+                        setUser({ uid: firebaseUser.uid, ...userData, name: userName, avatar: userAvatar });
                     } else {
                         // Fallback if Firestore doc is not created yet
+                        const userName = firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User';
                         const defaultUser = {
                             uid: firebaseUser.uid,
                             email: firebaseUser.email,
-                            name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
-                            avatar: firebaseUser.photoURL || generateAvatar(firebaseUser.displayName || firebaseUser.email),
+                            name: userName,
+                            avatar: firebaseUser.photoURL || generateAvatar(userName),
                             createdAt: new Date().toISOString()
                         };
                         setUser(defaultUser);
                     }
                 } catch (error) {
                     console.error("Firestore user profile fetch error:", error);
+                    const userName = firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User';
                     setUser({
                         uid: firebaseUser.uid,
                         email: firebaseUser.email,
-                        name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
-                        avatar: firebaseUser.photoURL || generateAvatar(firebaseUser.email)
+                        name: userName,
+                        avatar: firebaseUser.photoURL || generateAvatar(userName)
                     });
                 }
             } else {
@@ -304,5 +311,6 @@ export default function UserProvider({ children }) {
 }
 
 function generateAvatar(name) {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'User')}&background=0090f0&color=fff&size=128&bold=true`;
+    const safeName = (name && typeof name === 'string' && name.trim() !== '') ? name.trim() : 'User';
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(safeName)}&background=0090f0&color=fff&size=128&bold=true`;
 }

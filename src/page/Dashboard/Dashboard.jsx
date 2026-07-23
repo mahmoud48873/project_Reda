@@ -22,6 +22,16 @@ function Dashboard() {
 
     const [cancelModalData, setCancelModalData] = useState({ isOpen: false, order: null });
 
+    const handleImgError = (e, name) => {
+        e.target.onerror = null;
+        const initial = (name || 'U').trim().charAt(0).toUpperCase() || 'U';
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+          <rect width="128" height="128" fill="%230090f0" rx="64"/>
+          <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-size="60" font-weight="bold" font-family="sans-serif">${initial}</text>
+        </svg>`;
+        e.target.src = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+    };
+
     const handleCancelOrderClick = (order) => {
         setCancelModalData({ isOpen: true, order });
     };
@@ -80,9 +90,14 @@ function Dashboard() {
                 {/* Sidebar */}
                 <aside className="dashboard_sidebar">
                     <div className="sidebar_profile">
-                        <img src={user.avatar} alt={user.name} className="sidebar_avatar" />
-                        <h3>{user.name}</h3>
-                        <p>{user.email}</p>
+                        <img 
+                            src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=0090f0&color=fff&size=128&bold=true`} 
+                            alt={user?.name} 
+                            className="sidebar_avatar" 
+                            onError={(e) => handleImgError(e, user?.name)}
+                        />
+                        <h3>{user?.name}</h3>
+                        <p>{user?.email}</p>
                     </div>
                     <nav className="sidebar_nav">
                         <button className={activeTab === 'profile' ? 'active' : ''} onClick={() => setActiveTab('profile')}>
@@ -123,7 +138,11 @@ function Dashboard() {
 
                             <div className="profile_card">
                                 <div className="profile_avatar_wrap">
-                                    <img src={user.avatar} alt={user.name} />
+                                    <img 
+                                        src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=0090f0&color=fff&size=128&bold=true`} 
+                                        alt={user?.name} 
+                                        onError={(e) => handleImgError(e, user?.name)}
+                                    />
                                     <div className="profile_avatar_badge">
                                         <FaUser />
                                     </div>

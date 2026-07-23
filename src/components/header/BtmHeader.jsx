@@ -56,6 +56,16 @@ export default function BtmHeader() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleImgError = (e, name) => {
+    e.target.onerror = null;
+    const initial = (name || 'U').trim().charAt(0).toUpperCase() || 'U';
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+      <rect width="128" height="128" fill="%230090f0" rx="64"/>
+      <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" fill="%23ffffff" font-size="60" font-weight="bold" font-family="sans-serif">${initial}</text>
+    </svg>`;
+    e.target.src = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  };
+
   const handleLogout = () => {
     logout();
     showToast(language === 'ar' ? 'تم تسجيل الخروج بنجاح 👋' : 'Logged out. See you soon! 👋', 'info');
@@ -145,14 +155,23 @@ export default function BtmHeader() {
             {user ? (
               <div className="user_menu_wrap" ref={userMenuRef}>
                 <div className="user_avatar_btn" onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>
-                  <img src={user.avatar} alt={user.name} className="user_avatar_img" />
+                  <img 
+                    src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=0090f0&color=fff&size=128&bold=true`} 
+                    alt={user.name} 
+                    className="user_avatar_img" 
+                    onError={(e) => handleImgError(e, user.name)}
+                  />
                   <span className="user_name_header">{user.name.split(' ')[0]}</span>
                   <IoIosArrowDown className={`user_arrow ${isUserMenuOpen ? 'rotated' : ''}`} />
                 </div>
                 {isUserMenuOpen && (
                   <div className="user_dropdown">
                     <div className="user_dropdown_info">
-                      <img src={user.avatar} alt={user.name} />
+                      <img 
+                        src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=0090f0&color=fff&size=128&bold=true`} 
+                        alt={user.name} 
+                        onError={(e) => handleImgError(e, user.name)}
+                      />
                       <div>
                         <strong>{user.name}</strong>
                         <p>{user.email}</p>
@@ -212,7 +231,11 @@ export default function BtmHeader() {
               {user ? (
                 <div className="sidebar_user_card">
                   <div className="sidebar_user_info">
-                    <img src={user.avatar} alt={user.name} />
+                    <img 
+                      src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=0090f0&color=fff&size=128&bold=true`} 
+                      alt={user.name} 
+                      onError={(e) => handleImgError(e, user.name)}
+                    />
                     <div>
                       <strong>{user.name}</strong>
                       <p>{user.email}</p>
