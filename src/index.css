@@ -58,6 +58,11 @@ body.dark textarea {
   border-color: var(--border_color);
 }
 
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
 body {
   background-color: var(--bg_color);
   color: var(--color_heading);

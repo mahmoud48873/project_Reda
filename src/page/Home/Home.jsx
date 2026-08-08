@@ -88,7 +88,7 @@ const[loading,setLoading] =useState(true)
     };
 
     fetchProducts();
-  }, []);
+  });
 
   return (
     <div>

@@ -44,7 +44,7 @@ function CheckoutForm() {
     const stripe = useStripe();
     const elements = useElements();
     const { CartItem, clearCart } = useContext(CartContext);
-    const { user, saveOrder } = useContext(UserContext);
+    const { user, loading, saveOrder } = useContext(UserContext);
     const { showToast } = useContext(ToastContext);
     const { language, t } = useContext(LanguageContext) || {};
     const location = useLocation();
@@ -54,7 +54,7 @@ function CheckoutForm() {
     const [cardError, setCardError] = useState('');
 
     useEffect(() => {
-        if (!user) {
+        if (!loading && !user) {
             showToast?.(
                 language === 'ar'
                     ? 'عذراً! يجب عليك إنشاء حساب أولاً لعمل الطلب 🛒'
@@ -63,16 +63,16 @@ function CheckoutForm() {
             );
             navigate('/signup', { replace: true });
         }
-    }, [user, navigate, language, showToast]);
+    }, [user, loading, navigate, language, showToast]);
 
-    const [form, setForm] = useState({
+    const [form, setForm] = useState(() => ({
         name: user?.name || '',
         email: user?.email || '',
         phone: user?.phone || '',
         address: user?.address || '',
         city: '',
         paymentMethod: 'cod',
-    });
+    }));
     const [isProcessing, setIsProcessing] = useState(false);
     const [orderPlaced, setOrderPlaced] = useState(false);
 
@@ -189,8 +189,8 @@ function CheckoutForm() {
                             </div>
                             <div className="form_row_2">
                                 <div className="form_group">
-                                    <label>{t ? t('fullName') : 'Full Name *'}</label>
-                                    <input name="name" value={form.name} onChange={handleChange} placeholder={t ? t('enterYourName') : "Your full name"} required />
+                                    <label>{t ? t('fullName') : 'Full Name *'} <span style={{ fontSize: '11px', color: '#64748b' }}>(Max 15)</span></label>
+                                    <input name="name" maxLength={15} value={form.name} onChange={handleChange} placeholder={t ? t('enterYourName') : "Max 15 chars"} required />
                                 </div>
                                 <div className="form_group">
                                     <label>{t ? t('email') : 'Email *'}</label>
@@ -199,8 +199,8 @@ function CheckoutForm() {
                             </div>
                             <div className="form_row_2">
                                 <div className="form_group">
-                                    <label>{t ? t('phone') : 'Phone *'}</label>
-                                    <input name="phone" value={form.phone} onChange={handleChange} placeholder="+20 1xx xxx xxxx" required />
+                                    <label>{t ? t('phone') : 'Phone *'} <span style={{ fontSize: '11px', color: '#64748b' }}>(11 digits)</span></label>
+                                    <input name="phone" maxLength={11} value={form.phone} onChange={(e) => { e.target.value = e.target.value.replace(/\D/g, '').slice(0, 11); handleChange(e); }} placeholder="01xxxxxxxx" required />
                                 </div>
                                 <div className="form_group">
                                     <label>{t ? t('city') : 'City *'}</label>
@@ -208,8 +208,8 @@ function CheckoutForm() {
                                 </div>
                             </div>
                             <div className="form_group">
-                                <label>{t ? t('streetAddress') : 'Street Address *'}</label>
-                                <input name="address" value={form.address} onChange={handleChange} placeholder={t ? t('address') : "Your full address"} required />
+                                <label>{t ? t('streetAddress') : 'Street Address *'} <span style={{ fontSize: '11px', color: '#64748b' }}>(Max 60)</span></label>
+                                <input name="address" maxLength={60} value={form.address} onChange={handleChange} placeholder={t ? t('address') : "Your full address (Max 60 chars)"} required />
                             </div>
                         </div>
 

@@ -10,6 +10,7 @@ import './Login.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { BiErrorCircle } from "react-icons/bi";
 import { FaEye, FaEyeSlash, FaSignInAlt } from 'react-icons/fa';
+import { FcGoogle } from 'react-icons/fc';
 import { 
     signInWithEmailAndPassword, 
     signOut 
@@ -26,10 +27,27 @@ function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const { user } = useContext(UserContext) || {};
+    const { user, loginWithGoogle } = useContext(UserContext) || {};
     const { showToast } = useContext(ToastContext) || {};
     const { t } = useContext(LanguageContext) || { t: (key) => key };
     const navigate = useNavigate();
+
+    const handleGoogleSignIn = async () => {
+        setError('');
+        setIsLoading(true);
+        try {
+            await loginWithGoogle();
+            if (showToast) {
+                showToast("Welcome back! Signed in with Google 🚀", 'success');
+            }
+            navigate('/');
+        } catch (err) {
+            console.error("Google sign-in error:", err);
+            setError(err.message || "Google Sign-In failed. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
         if (user && user.emailVerified) {
@@ -140,6 +158,16 @@ function Login() {
                     <button type="submit" className="login_btn" disabled={isLoading}>
                         {isLoading ? <span className="btn_spinner"></span> : (t('signIn') || 'Sign In')}
                     </button>
+
+                    <div className="social_divider">
+                        <span>OR</span>
+                    </div>
+
+                    <button type="button" className="google_auth_btn" onClick={handleGoogleSignIn} disabled={isLoading}>
+                        <FcGoogle className="google_icon" />
+                        <span>Continue with Google</span>
+                    </button>
+
                     <p className="register_link">
                         {t('dontHaveAccount') || "Don't have an account?"} <Link to="/signup">{t('signUp') || 'Sign up here'}</Link>
                     </p>

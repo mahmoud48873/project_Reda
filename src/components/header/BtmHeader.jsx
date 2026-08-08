@@ -86,7 +86,7 @@ export default function BtmHeader() {
 
   return (
     <>
-      <div className="btm_header bg-(--main-color) transition-colors duration-300">
+      <div className="btm_header bg-[var(--main-color)] transition-colors duration-300">
         <div className="container flex items-center justify-between">
           <nav className="nav flex items-center gap-6 md:gap-8">
             <div className="category_nav relative">

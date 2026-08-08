@@ -83,3 +83,71 @@ body.dark .signup_container { background-color: var(--white_color); border: 1px 
 body.dark .signup_container h2 { color: var(--color_heading); }
 body.dark .signup_subtitle { color: #aaa; }
 body.dark .login_link { color: #aaa; }
+
+/* Google Auth Button & Divider */
+.social_divider {
+    display: flex;
+    align-items: center;
+    margin: 20px 0 16px;
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.social_divider::before,
+.social_divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.social_divider span {
+    padding: 0 12px;
+}
+
+.google_auth_btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 18px;
+    background-color: #ffffff;
+    color: #1e293b;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.google_auth_btn:hover:not(:disabled) {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+}
+
+.google_auth_btn .google_icon {
+    font-size: 22px;
+}
+
+body.dark .google_auth_btn {
+    background-color: #1e293b;
+    color: #f8fafc;
+    border-color: #334155;
+}
+
+body.dark .google_auth_btn:hover:not(:disabled) {
+    background-color: #334155;
+    border-color: #475569;
+}
+
+body.dark .social_divider::before,
+body.dark .social_divider::after {
+    border-bottom-color: #334155;
+}

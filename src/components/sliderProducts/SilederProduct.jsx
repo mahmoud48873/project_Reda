@@ -25,9 +25,11 @@ export default function SilederProduct({ data, title }) {
             pauseOnMouseEnter: true,
           }}
           breakpoints={{
-            0: { slidesPerView: 1.3, spaceBetween: 5 },
-            640: { slidesPerView: 2.2, spaceBetween: 10 },
-            1024: { slidesPerView: 4.6, spaceBetween: 20 },
+            0: { slidesPerView: 1.3, spaceBetween: 10 },
+            480: { slidesPerView: 2.1, spaceBetween: 12 },
+            768: { slidesPerView: 3, spaceBetween: 15 },
+            992: { slidesPerView: 3.8, spaceBetween: 18 },
+            1200: { slidesPerView: 4.6, spaceBetween: 20 },
           }}
           pagination={{
             dynamicBullets: true,

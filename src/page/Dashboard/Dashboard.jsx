@@ -9,7 +9,7 @@ import { FaUser, FaBox, FaHeart, FaEdit, FaSave, FaTimes, FaShoppingBag, FaMapMa
 import './Dashboard.css';
 
 function Dashboard() {
-    const { user, logout, getOrders, cancelOrder, updateUser } = useContext(UserContext);
+    const { user, loading, logout, getOrders, cancelOrder, updateUser } = useContext(UserContext);
     const { showToast } = useContext(ToastContext);
     const { language } = useContext(LanguageContext) || {};
     const navigate = useNavigate();
@@ -21,6 +21,16 @@ function Dashboard() {
     const [, setLoadingOrders] = useState(true);
 
     const [cancelModalData, setCancelModalData] = useState({ isOpen: false, order: null });
+
+    React.useEffect(() => {
+        if (user) {
+            setEditData({
+                name: user.name || '',
+                phone: user.phone || '',
+                address: user.address || ''
+            });
+        }
+    }, [user]);
 
     const handleImgError = (e, name) => {
         e.target.onerror = null;
@@ -68,8 +78,25 @@ function Dashboard() {
     }, [user]);
 
     const handleSave = () => {
+        if (!editData.name || editData.name.trim().length === 0) {
+            showToast(language === 'ar' ? 'يرجى إدخال الاسم' : 'Please enter your name', 'error');
+            return;
+        }
+        if (editData.name.trim().length > 15) {
+            showToast(language === 'ar' ? 'الاسم يجب ألا يتجاوز 15 حرفاً' : 'Name cannot exceed 15 characters', 'error');
+            return;
+        }
+        if (editData.phone && editData.phone.length > 0 && editData.phone.length !== 11) {
+            showToast(language === 'ar' ? 'رقم الهاتف يجب أن يتكون من 11 رقماً' : 'Phone number must be exactly 11 digits', 'error');
+            return;
+        }
+        if (editData.address && editData.address.trim().length > 60) {
+            showToast(language === 'ar' ? 'العنوان يجب ألا يتجاوز 60 حرفاً' : 'Address cannot exceed 60 characters', 'error');
+            return;
+        }
+
         updateUser(editData);
-        showToast('Profile updated successfully!', 'success');
+        showToast(language === 'ar' ? 'تم تحديث الملف الشخصي بنجاح!' : 'Profile updated successfully!', 'success');
         setIsEditing(false);
     };
 
@@ -83,6 +110,19 @@ function Dashboard() {
         const map = { 'Processing': '#f59e0b', 'Shipped': '#3b82f6', 'Delivered': '#22c55e', 'Cancelled': '#ef4444' };
         return map[status] || '#888';
     };
+
+    if (loading) {
+        return (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px', flexDirection: 'column', gap: '15px' }}>
+                <div style={{ width: '40px', height: '40px', border: '4px solid #e2e8f0', borderTop: '4px solid #0090f0', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+                <p style={{ color: '#64748b', fontSize: '14px' }}>{language === 'ar' ? 'جاري تحميل بيانات حسابك...' : 'Loading your account...'}</p>
+            </div>
+        );
+    }
+
+    if (!user) {
+        return null;
+    }
 
     return (
         <div className="dashboard_page">
@@ -149,36 +189,54 @@ function Dashboard() {
                                 </div>
                                 <div className="profile_info_grid">
                                     <div className="info_field">
-                                        <label><FaUser /> Full Name</label>
+                                        <label><FaUser /> Full Name {isEditing && <span style={{ fontSize: '11px', color: '#64748b' }}>(Max 15)</span>}</label>
                                         {isEditing ? (
-                                            <input value={editData.name} onChange={e => setEditData({ ...editData, name: e.target.value })} />
+                                            <input 
+                                                type="text" 
+                                                maxLength={15} 
+                                                value={editData.name} 
+                                                onChange={e => setEditData({ ...editData, name: e.target.value.slice(0, 15) })} 
+                                                placeholder="Max 15 chars"
+                                            />
                                         ) : (
-                                            <p>{user.name}</p>
+                                            <p>{user?.name}</p>
                                         )}
                                     </div>
                                     <div className="info_field">
                                         <label>📧 Email Address</label>
-                                        <p>{user.email}</p>
+                                        <p>{user?.email}</p>
                                     </div>
                                     <div className="info_field">
-                                        <label><FaPhone /> Phone Number</label>
+                                        <label><FaPhone /> Phone Number {isEditing && <span style={{ fontSize: '11px', color: '#64748b' }}>(11 digits)</span>}</label>
                                         {isEditing ? (
-                                            <input value={editData.phone} onChange={e => setEditData({ ...editData, phone: e.target.value })} placeholder="e.g. +20 1xx xxx xxxx" />
+                                            <input 
+                                                type="tel" 
+                                                maxLength={11} 
+                                                value={editData.phone} 
+                                                onChange={e => setEditData({ ...editData, phone: e.target.value.replace(/\D/g, '').slice(0, 11) })} 
+                                                placeholder="e.g. 01xxxxxxxx (11 digits)" 
+                                            />
                                         ) : (
-                                            <p>{user.phone || <span className="not_set">Not set</span>}</p>
+                                            <p>{user?.phone || <span className="not_set">Not set</span>}</p>
                                         )}
                                     </div>
                                     <div className="info_field">
-                                        <label><FaMapMarkerAlt /> Address</label>
+                                        <label><FaMapMarkerAlt /> Address {isEditing && <span style={{ fontSize: '11px', color: '#64748b' }}>(Max 60)</span>}</label>
                                         {isEditing ? (
-                                            <input value={editData.address} onChange={e => setEditData({ ...editData, address: e.target.value })} placeholder="e.g. Cairo, Egypt" />
+                                            <input 
+                                                type="text" 
+                                                maxLength={60} 
+                                                value={editData.address} 
+                                                onChange={e => setEditData({ ...editData, address: e.target.value.slice(0, 60) })} 
+                                                placeholder="e.g. Cairo, Nasr City (Max 60 chars)" 
+                                            />
                                         ) : (
-                                            <p>{user.address || <span className="not_set">Not set</span>}</p>
+                                            <p>{user?.address || <span className="not_set">Not set</span>}</p>
                                         )}
                                     </div>
                                     <div className="info_field">
                                         <label>📅 Member Since</label>
-                                        <p>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</p>
+                                        <p>{user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</p>
                                     </div>
                                     <div className="info_field">
                                         <label><FaShoppingBag /> Total Orders</label>

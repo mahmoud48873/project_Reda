@@ -10,6 +10,7 @@ import './SignUp.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { BiErrorCircle } from "react-icons/bi";
 import { FaEye, FaEyeSlash, FaUserPlus } from 'react-icons/fa';
+import { FcGoogle } from 'react-icons/fc';
 import { 
     createUserWithEmailAndPassword, 
     sendEmailVerification, 
@@ -32,9 +33,26 @@ function SignUp() {
     const [showConfirm, setShowConfirm] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const { user } = useContext(UserContext) || {};
+    const { user, loginWithGoogle } = useContext(UserContext) || {};
     const { showToast } = useContext(ToastContext) || {};
     const navigate = useNavigate();
+
+    const handleGoogleSignUp = async () => {
+        setError('');
+        setIsLoading(true);
+        try {
+            await loginWithGoogle();
+            if (showToast) {
+                showToast("Welcome! Signed in with Google 🚀", 'success');
+            }
+            navigate('/');
+        } catch (err) {
+            console.error("Google sign-in error:", err);
+            setError(err.message || "Google Sign-In failed. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
         if (user && user.emailVerified) {
@@ -151,13 +169,14 @@ function SignUp() {
 
                 <form onSubmit={handleSubmit} className='signup_form'>
                     <div className="form_group">
-                        <label htmlFor="name">Full Name</label>
+                        <label htmlFor="name">Full Name <span style={{ fontSize: '11px', color: '#64748b' }}>(Max 15)</span></label>
                         <input
                             type="text"
                             id="name"
-                            placeholder="Enter your full name"
+                            maxLength={15}
+                            placeholder="Enter your full name (Max 15 chars)"
                             value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            onChange={(e) => setName(e.target.value.slice(0, 15))}
                             required
                         />
                     </div>
@@ -207,6 +226,16 @@ function SignUp() {
                     <button type="submit" className="signup_btn" disabled={isLoading}>
                         {isLoading ? <span className="btn_spinner"></span> : 'Create Account'}
                     </button>
+
+                    <div className="social_divider">
+                        <span>OR</span>
+                    </div>
+
+                    <button type="button" className="google_auth_btn" onClick={handleGoogleSignUp} disabled={isLoading}>
+                        <FcGoogle className="google_icon" />
+                        <span>Continue with Google</span>
+                    </button>
+
                     <p className="login_link">
                         Already have an account? <Link to="/login">Sign in here</Link>
                     </p>

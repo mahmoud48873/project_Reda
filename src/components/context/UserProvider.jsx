@@ -6,7 +6,9 @@ import {
     createUserWithEmailAndPassword, 
     signInWithEmailAndPassword, 
     signOut, 
-    updateProfile 
+    updateProfile,
+    GoogleAuthProvider,
+    signInWithPopup
 } from 'firebase/auth';
 import { 
     doc, 
@@ -156,7 +158,40 @@ export default function UserProvider({ children }) {
         return userProfile;
     };
 
-    // 4. Logout function
+    // 4. Google Sign-In function
+    const loginWithGoogle = async () => {
+        const provider = new GoogleAuthProvider();
+        const userCredential = await signInWithPopup(auth, provider);
+        const firebaseUser = userCredential.user;
+
+        const userName = firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User';
+        const userAvatar = firebaseUser.photoURL || generateAvatar(userName);
+
+        let userProfile = {
+            uid: firebaseUser.uid,
+            name: userName,
+            email: firebaseUser.email,
+            avatar: userAvatar,
+            role: 'user',
+            createdAt: new Date().toISOString()
+        };
+
+        const userDocRef = doc(db, 'users', firebaseUser.uid);
+        const userSnap = await getDoc(userDocRef);
+
+        if (userSnap.exists()) {
+            userProfile = { uid: firebaseUser.uid, ...userSnap.data() };
+        } else {
+            await setDoc(userDocRef, userProfile).catch(err => {
+                console.warn("Firestore setDoc Google login error:", err);
+            });
+        }
+
+        setUser(userProfile);
+        return userProfile;
+    };
+
+    // 5. Logout function
     const logout = async () => {
         await signOut(auth);
         setUser(null);
@@ -298,6 +333,7 @@ export default function UserProvider({ children }) {
             loading, 
             login, 
             signup, 
+            loginWithGoogle,
             logout, 
             updateUser, 
             saveOrder, 
